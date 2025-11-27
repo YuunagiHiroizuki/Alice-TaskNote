@@ -1,4 +1,17 @@
-# Vue 3 + Vite
+# 项目
+
+Nodejs v22
+技术栈：Vue 3 + Vite + TailWind + Element Plus + FastAPI
+
+## 部署
+
+``` bash
+pnpm install 
+```
+
+``` bash
+pnpm run
+```
 
 This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
 
