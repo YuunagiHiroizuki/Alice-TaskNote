@@ -1,7 +1,8 @@
 # 项目
 
-Nodejs v22
-技术栈：Vue 3 + Vite + TailWind + Element Plus + FastAPI
+Nodejs v22  
+
+Use Vue 3 + Vite + TailWind + Element Plus + FastAPI
 
 ## 部署
 
