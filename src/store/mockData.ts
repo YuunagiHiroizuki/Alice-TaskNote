@@ -1,6 +1,6 @@
 // src/store/mockData.ts
-import { ref, computed } from 'vue'
-import type { Item } from '@/types'
+import { ref, computed } from 'vue';
+import type { Item } from '@/types';
 
 // 模拟数据库表
 const MOCK_ITEMS: Item[] = [
@@ -60,33 +60,36 @@ const MOCK_ITEMS: Item[] = [
     created_at: '2025-11-09 14:00',
     isPinned: false,
   },
-]
+];
 
 // ------------------------------------
 // 模拟的 API 服务
 // ------------------------------------
 
 // 响应式的数据源
-const items = ref<Item[]>(MOCK_ITEMS)
-let nextId = 6 // 模拟自增ID
+const items = ref<Item[]>(MOCK_ITEMS);
+let nextId = 6; // 模拟自增ID
 
 // 按类型获取 (Read)
 export const getItems = (type: 'task' | 'note') => {
-  return computed(() =>
-    items.value
-      .filter((item) => item.type === type)
-      .sort((a, b) => (a.isPinned === b.isPinned ? 0 : a.isPinned ? -1 : 1)) // 置顶优先
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) // 时间倒序
-  )
-}
+  return computed(
+    () =>
+      items.value
+        .filter((item) => item.type === type)
+        .sort((a, b) => (a.isPinned === b.isPinned ? 0 : a.isPinned ? -1 : 1)) // 置顶优先
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) // 时间倒序
+  );
+};
 
 // 获取单个Item (Read)
 export const getItemById = (id: number) => {
-  return computed(() => items.value.find(item => item.id === id))
-}
+  return computed(() => items.value.find((item) => item.id === id));
+};
 
 // 创建 (Create)
-export const createItem = (newItemData: Omit<Item, 'id' | 'created_at' | 'isPinned' | 'tags'> & { tags?: string[] }) => {
+export const createItem = (
+  newItemData: Omit<Item, 'id' | 'created_at' | 'isPinned' | 'tags'> & { tags?: string[] }
+) => {
   const newItem: Item = {
     ...newItemData,
     id: nextId++,
@@ -96,22 +99,22 @@ export const createItem = (newItemData: Omit<Item, 'id' | 'created_at' | 'isPinn
     status: newItemData.status || 'todo',
     created_at: new Date().toISOString(),
     isPinned: false,
-  }
-  items.value.unshift(newItem)
-  console.log('Created:', newItem)
-}
+  };
+  items.value.unshift(newItem);
+  console.log('Created:', newItem);
+};
 
 // 更新 (Update)
 export const updateItem = (id: number, updatedData: Partial<Item>) => {
-  const index = items.value.findIndex((item) => item.id === id)
+  const index = items.value.findIndex((item) => item.id === id);
   if (index !== -1) {
-    items.value[index] = { ...items.value[index], ...updatedData }
-    console.log('Updated:', items.value[index])
+    items.value[index] = { ...items.value[index], ...updatedData };
+    console.log('Updated:', items.value[index]);
   }
-}
+};
 
 // 删除 (Delete)
 export const deleteItem = (id: number) => {
-  items.value = items.value.filter((item) => item.id !== id)
-  console.log('Deleted:', id)
-}
+  items.value = items.value.filter((item) => item.id !== id);
+  console.log('Deleted:', id);
+};

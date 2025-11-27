@@ -11,13 +11,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed } from 'vue';
+import { useRoute } from 'vue-router';
 
-const route = useRoute()
-const search = ref('')
+const route = useRoute();
+const search = ref('');
 
 const title = computed(() => {
-  return route.path.replace('/', '') || 'Notes'
-})
+  return route.path.replace('/', '') || 'Notes';
+});
 </script>

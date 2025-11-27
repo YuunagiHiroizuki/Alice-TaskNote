@@ -34,63 +34,63 @@
       <el-form-item label="笔记内容 (支持Markdown)" prop="content" v-if="type === 'note'">
         <el-input v-model="form.content" type="textarea" :rows="5" />
       </el-form-item>
-
     </el-form>
-    
+
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="emit('update:modelValue', false)">取消</el-button>
-        <el-button type="primary" @click="handleConfirm">
-          确定
-        </el-button>
+        <el-button type="primary" @click="handleConfirm"> 确定 </el-button>
       </span>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
+import { ref, reactive, watch } from 'vue';
+import type { FormInstance, FormRules } from 'element-plus';
 
 // Props
 const props = defineProps<{
-  modelValue: boolean // 控制显示/隐藏 (v-model)
-  type: 'task' | 'note'
-}>()
+  modelValue: boolean; // 控制显示/隐藏 (v-model)
+  type: 'task' | 'note';
+}>();
 
 // Emits
-const emit = defineEmits(['update:modelValue', 'confirm'])
+const emit = defineEmits(['update:modelValue', 'confirm']);
 
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>();
 const form = reactive({
   title: '',
   content: '',
   deadline: '',
   priority: 'medium' as 'high' | 'medium' | 'low',
-})
+});
 
 const rules = reactive<FormRules>({
   title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
-})
+});
 
 // 监听弹窗打开，重置表单
-watch(() => props.modelValue, (newValue) => {
-  if (newValue) {
-    formRef.value?.resetFields()
-    form.title = ''
-    form.content = ''
-    form.deadline = ''
-    form.priority = 'medium'
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue) {
+      formRef.value?.resetFields();
+      form.title = '';
+      form.content = '';
+      form.deadline = '';
+      form.priority = 'medium';
+    }
   }
-})
+);
 
 // 确认
 const handleConfirm = async () => {
-  if (!formRef.value) return
+  if (!formRef.value) return;
   await formRef.value.validate((valid) => {
     if (valid) {
-      emit('confirm', { ...form })
+      emit('confirm', { ...form });
     }
-  })
-}
+  });
+};
 </script>

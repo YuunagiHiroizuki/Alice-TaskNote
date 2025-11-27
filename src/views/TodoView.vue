@@ -22,11 +22,9 @@
             <el-icon><Plus /></el-icon>
           </template>
         </el-input>
-        <el-button text class="mt-1" @click="dialogVisible = true">
-          或使用手动创建...
-        </el-button>
+        <el-button text class="mt-1" @click="dialogVisible = true"> 或使用手动创建... </el-button>
       </div>
-       
+
       <h2 class="text-lg font-semibold text-gray-700 mb-3">未完成 ({{ pendingTasks.length }})</h2>
       <div v-if="pendingTasks.length > 0">
         <ItemCard
@@ -52,72 +50,72 @@
         />
       </div>
       <el-empty v-else description="暂无已完成任务" />
-
     </div>
 
-    <CreateItemDialog 
-      v-model="dialogVisible" 
-      type="task" 
-      @confirm="handleCreateTask" 
-    />
+    <CreateItemDialog v-model="dialogVisible" type="task" @confirm="handleCreateTask" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { ElMessage } from 'element-plus'
-import { getItems, createItem, updateItem, deleteItem } from '@/store/mockData'
-import ItemCard from '@/components/ItemCard.vue'
-import CreateItemDialog from '@/components/CreateItemDialog.vue'
-import { Search, Delete, Filter, Sort, Plus } from '@element-plus/icons-vue'
+import { ref, computed } from 'vue';
+import { ElMessage } from 'element-plus';
+import { getItems, createItem, updateItem, deleteItem } from '@/store/mockData';
+import ItemCard from '@/components/ItemCard.vue';
+import CreateItemDialog from '@/components/CreateItemDialog.vue';
+import { Search, Delete, Filter, Sort, Plus } from '@element-plus/icons-vue';
 
 // 模拟数据
-const tasks = getItems('task')
+const tasks = getItems('task');
 // const activeCollapse = ref(['completed']) // 已删除，不再需要
-const newTaskTitle = ref('')
-const dialogVisible = ref(false)
+const newTaskTitle = ref('');
+const dialogVisible = ref(false);
 
 // 计算属性分离列表
-const pendingTasks = computed(() => tasks.value.filter(t => t.status !== 'done'))
-const completedTasks = computed(() => tasks.value.filter(t => t.status === 'done'))
+const pendingTasks = computed(() => tasks.value.filter((t) => t.status !== 'done'));
+const completedTasks = computed(() => tasks.value.filter((t) => t.status === 'done'));
 
 // 快速创建
 const handleQuickCreate = () => {
-  if (!newTaskTitle.value.trim()) return
+  if (!newTaskTitle.value.trim()) return;
   // MVP: 直接创建
   createItem({
     type: 'task',
     title: newTaskTitle.value,
-  })
-  newTaskTitle.value = ''
-  ElMessage.success('快速创建成功')
-}
+  });
+  newTaskTitle.value = '';
+  ElMessage.success('快速创建成功');
+};
 
 // 详细创建
-const handleCreateTask = (data: { title: string, content: string, deadline: string, priority: 'high' | 'medium' | 'low' }) => {
+const handleCreateTask = (data: {
+  title: string;
+  content: string;
+  deadline: string;
+  priority: 'high' | 'medium' | 'low';
+}) => {
   createItem({
     type: 'task',
     title: data.title,
     content: data.content,
     deadline: data.deadline,
     priority: data.priority,
-  })
-  ElMessage.success('任务创建成功')
-  dialogVisible.value = false
-}
+  });
+  ElMessage.success('任务创建成功');
+  dialogVisible.value = false;
+};
 
 // 切换状态
 const handleToggleStatus = (id: number) => {
-  const task = tasks.value.find(t => t.id === id)
+  const task = tasks.value.find((t) => t.id === id);
   if (task) {
-    const newStatus = task.status === 'done' ? 'todo' : 'done'
-    updateItem(id, { status: newStatus })
+    const newStatus = task.status === 'done' ? 'todo' : 'done';
+    updateItem(id, { status: newStatus });
   }
-}
+};
 
 // 删除
 const handleDeleteTask = (id: number) => {
-  deleteItem(id)
-  ElMessage.success('删除成功')
-}
+  deleteItem(id);
+  ElMessage.success('删除成功');
+};
 </script>

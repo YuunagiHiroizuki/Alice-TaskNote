@@ -1,8 +1,8 @@
 // src/router/index.ts
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router';
 // 引入视图
-import TodoView from '@/views/TodoView.vue'
-import NoteView from '@/views/NoteView.vue'
+import TodoView from '@/views/TodoView.vue';
+import NoteView from '@/views/NoteView.vue';
 
 const routes = [
   {
@@ -30,11 +30,11 @@ const routes = [
     name: 'Tags',
     component: () => import('@/views/PlaceholderView.vue'),
   },
-]
+];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
-})
+});
 
-export default router
+export default router;

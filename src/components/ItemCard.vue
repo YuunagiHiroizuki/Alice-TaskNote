@@ -1,9 +1,9 @@
 <template>
   <div
     class="mb-3 flex items-center rounded-lg border bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md"
-    :class="{ 
+    :class="{
       'opacity-60': item.type === 'task' && item.status === 'done',
-      'border-l-4 border-blue-500': item.isPinned
+      'border-l-4 border-blue-500': item.isPinned,
     }"
   >
     <el-checkbox
@@ -14,24 +14,30 @@
       class="mr-3"
     />
 
-    <div 
-  class="flex-1 overflow-hidden cursor-pointer" 
-  @click="item.type === 'note' ? emit('view', item.id) : null"
->
-  <p 
-    class="truncate text-base font-medium text-gray-800"
-    :class="{ 'line-through text-gray-400': item.type === 'task' && item.status === 'done' }"
-  >
-    {{ item.title }}
-  </p>
+    <div
+      class="flex-1 overflow-hidden cursor-pointer"
+      @click="item.type === 'note' ? emit('view', item.id) : null"
+    >
+      <p
+        class="truncate text-base font-medium text-gray-800"
+        :class="{ 'line-through text-gray-400': item.type === 'task' && item.status === 'done' }"
+      >
+        {{ item.title }}
+      </p>
 
-  <p v-if="item.type === 'note' && item.content" class="truncate text-sm text-gray-500 mt-1">
-    {{ cleanContent(item.content) }}
-  </p>
-</div>
+      <p v-if="item.type === 'note' && item.content" class="truncate text-sm text-gray-500 mt-1">
+        {{ cleanContent(item.content) }}
+      </p>
+    </div>
 
     <div class="ml-4 hidden space-x-1 md:block">
-      <el-tag v-for="tag in item.tags.slice(0, 2)" :key="tag" type="info" size="small" effect="plain">
+      <el-tag
+        v-for="tag in item.tags.slice(0, 2)"
+        :key="tag"
+        type="info"
+        size="small"
+        effect="plain"
+      >
         {{ tag }}
       </el-tag>
       <el-tag v-if="item.tags.length > 2" size="small" effect="plain">
@@ -53,7 +59,7 @@
             <el-icon><PriceTag /></el-icon>
             添加/编辑标签
           </el-dropdown-item>
-          
+
           <el-dropdown-item v-if="item.type === 'note'">
             <el-icon><Lock /></el-icon>
             加密
@@ -77,29 +83,28 @@
 </template>
 
 <script setup lang="ts">
-import { type Item } from '@/types'
-import { updateItem } from '@/store/mockData'
+import { type Item } from '@/types';
+import { updateItem } from '@/store/mockData';
 
 // Props
 const props = defineProps<{
-  item: Item
-}>()
+  item: Item;
+}>();
 
 // Emits
 const emit = defineEmits<{
-  (e: 'toggle', id: number): void
-  (e: 'delete', id: number): void
-  (e: 'view', id: number): void
-}>()
+  (e: 'toggle', id: number): void;
+  (e: 'delete', id: number): void;
+  (e: 'view', id: number): void;
+}>();
 
 // 移除Markdown
 const cleanContent = (content: string) => {
-  return content.replace(/^[#*->\s]+|\[.*?\]\(.*?\)/g, '').split('\n')[0] || ''
-}
+  return content.replace(/^[#*->\s]+|\[.*?\]\(.*?\)/g, '').split('\n')[0] || '';
+};
 
 // 置顶
 const handlePin = () => {
-  updateItem(props.item.id, { isPinned: !props.item.isPinned })
-}
-
+  updateItem(props.item.id, { isPinned: !props.item.isPinned });
+};
 </script>
