@@ -1,5 +1,56 @@
 @import 'tailwindcss';
 
+:root {
+    
+    /* —— 主色（按钮 / 链接 / 交互主色） —— */
+    --alice-primary: #7295ca;
+
+    /* —— 分层背景色（从浅到深，自上而下使用） —— */
+    --alice-bg: #dce3ea;
+    /* 页面整体背景（最浅） */
+    --alice-card: #cee0e5;
+    /* 卡片背景 */
+    --alice-section: #b7dae3;
+    /* 分区背景或边框（比卡片更深） */
+
+    /* —— 点缀色（慎用：标签、小图标、高亮） —— */
+    --alice-accent: #eed75e;
+
+    /* —— 字体色（根据你的浅色背景优化） —— */
+    --alice-text: #2a2a2a;
+    /* 普通文本 */
+    --alice-text-muted: #5b5b5b;
+    /* 弱化文本 */
+
+    /* —— 边框 & 阴影 —— */
+    --alice-border: rgba(0, 0, 0, 0.08);
+    --alice-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    /* 图表主线色 */
+    --chart-primary: #597eb7;
+
+    /* 第二条数据（对比色） */
+    --chart-secondary: #7bb3d6;
+
+    /* 第三条数据（柠檬黄，少量使用，高亮数据） */
+    --chart-accent: #eed75e;
+
+    /* 辅助：面积图渐变底色（透明） */
+    --chart-primary-fade: rgba(114, 149, 202, 0.25);
+    --chart-secondary-fade: rgba(123, 179, 214, 0.25);
+    --chart-accent-fade: rgba(238, 215, 94, 0.25);
+
+    /* 网格线 / 坐标轴 */
+    --chart-grid: rgba(0, 0, 0, 0.08);
+}
+
+
+
+
+
+
+
+
 html,
 body,
 #app {
