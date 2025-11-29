@@ -1,22 +1,32 @@
 <template>
   <div class="h-full flex flex-col">
-    <header class="h-16 flex-shrink-0 border-b bg-white flex items-center justify-between px-6">
-      <h1 class="text-2xl font-semibold">Stats</h1>
+    <header
+      class="h-16 flex-shrink-0 rounded-lg flex items-center justify-between px-6 mx-6 mt-6"
+      :style="{
+        background: 'var(--alice-card)',
+        border: '1px solid var(--alice-border)',
+        color: 'var(--alice-text)',
+      }"
+    >
+      <h2 class="text-2xl font-semibold">Status</h2>
     </header>
 
     <!-- 加载状态 -->
     <div v-if="loading" class="flex-1 flex justify-center items-center">
       <div class="text-center">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-        <p class="mt-2 text-gray-600">加载数据中...</p>
+        <div
+          class="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto"
+          :style="{ borderColor: 'var(--alice-primary)' }"
+        ></div>
+        <p class="mt-2" :style="{ color: 'var(--alice-text-muted)' }">加载数据中...</p>
       </div>
     </div>
 
     <!-- 错误状态 -->
     <div v-else-if="error" class="flex-1 flex justify-center items-center">
-      <div class="text-center text-gray-700">
+      <div class="text-center" :style="{ color: 'var(--alice-text)' }">
         <p class="text-lg">数据加载失败</p>
-        <p class="text-sm mt-2">{{ error }}</p>
+        <p class="text-sm mt-2" :style="{ color: 'var(--alice-text-muted)' }">{{ error }}</p>
         <el-button @click="fetchData" type="primary" class="mt-4">重试</el-button>
       </div>
     </div>
@@ -26,8 +36,16 @@
       <!-- 主展示面板 -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- 今日进度 -->
-        <div class="bg-white border border-gray-200 rounded-lg p-6">
-          <h2 class="text-lg font-semibold text-gray-700 mb-4">今日进度</h2>
+        <div
+          class="rounded-lg p-6"
+          :style="{
+            background: 'var(--alice-card)',
+            border: '1px solid var(--alice-border)',
+          }"
+        >
+          <h2 class="text-lg font-semibold mb-4" :style="{ color: 'var(--alice-text)' }">
+            今日进度
+          </h2>
           <div class="flex items-center justify-center">
             <ProgressRing
               :completed="todayStats.completed"
@@ -38,32 +56,46 @@
             />
           </div>
           <div class="mt-4 grid grid-cols-3 gap-2 text-center">
-            <div class="text-green-600">
+            <div :style="{ color: 'var(--chart-primary)' }">
               <div class="text-2xl font-bold">{{ todayStats.completed }}</div>
-              <div class="text-sm text-gray-600">已完成</div>
+              <div class="text-sm" :style="{ color: 'var(--alice-text-muted)' }">已完成</div>
             </div>
-            <div class="text-orange-500">
+            <div :style="{ color: 'var(--chart-secondary)' }">
               <div class="text-2xl font-bold">{{ todayStats.inProgress }}</div>
-              <div class="text-sm text-gray-600">进行中</div>
+              <div class="text-sm" :style="{ color: 'var(--alice-text-muted)' }">进行中</div>
             </div>
-            <div class="text-gray-500">
+            <div :style="{ color: 'var(--chart-accent)' }">
               <div class="text-2xl font-bold">{{ todayStats.remaining }}</div>
-              <div class="text-sm text-gray-600">待完成</div>
+              <div class="text-sm" :style="{ color: 'var(--alice-text-muted)' }">待完成</div>
             </div>
           </div>
         </div>
 
         <!-- 月度总览 -->
-        <div class="bg-white border border-gray-200 rounded-lg p-6">
-          <h2 class="text-lg font-semibold text-gray-700 mb-4">月度总览</h2>
+        <div
+          class="rounded-lg p-6"
+          :style="{
+            background: 'var(--alice-card)',
+            border: '1px solid var(--alice-border)',
+          }"
+        >
+          <h2 class="text-lg font-semibold mb-4" :style="{ color: 'var(--alice-text)' }">
+            月度总览
+          </h2>
           <AreaChart :data="monthData" />
         </div>
       </div>
 
       <!-- 可切换面板 -->
-      <div class="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+      <div
+        class="rounded-lg p-6 mb-6"
+        :style="{
+          background: 'var(--alice-card)',
+          border: '1px solid var(--alice-border)',
+        }"
+      >
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-lg font-semibold text-gray-700">进度趋势</h2>
+          <h2 class="text-lg font-semibold" :style="{ color: 'var(--alice-text)' }">进度趋势</h2>
           <div class="flex space-x-2">
             <el-button :type="activeView === 'week' ? 'primary' : ''" @click="activeView = 'week'">
               本周
@@ -83,23 +115,41 @@
       </div>
 
       <!-- 任务优先级分布 -->
-      <div v-if="priorityData" class="bg-white border border-gray-200 rounded-lg p-6">
-        <h2 class="text-lg font-semibold text-gray-700 mb-4">任务优先级分布</h2>
+      <div
+        v-if="priorityData"
+        class="rounded-lg p-6"
+        :style="{
+          background: 'var(--alice-card)',
+          border: '1px solid var(--alice-border)',
+        }"
+      >
+        <h2 class="text-lg font-semibold mb-4" :style="{ color: 'var(--alice-text)' }">
+          任务优先级分布
+        </h2>
 
         <!-- 图例 -->
         <div class="flex justify-center mb-6">
           <div class="flex items-center space-x-6 text-sm">
             <div class="flex items-center space-x-2">
-              <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span class="text-gray-600">已完成</span>
+              <div
+                class="w-3 h-3 rounded-full"
+                :style="{ background: 'var(--chart-primary)' }"
+              ></div>
+              <span :style="{ color: 'var(--alice-text-muted)' }">已完成</span>
             </div>
             <div class="flex items-center space-x-2">
-              <div class="w-3 h-3 bg-orange-500 rounded-full"></div>
-              <span class="text-gray-600">进行中</span>
+              <div
+                class="w-3 h-3 rounded-full"
+                :style="{ background: 'var(--chart-secondary)' }"
+              ></div>
+              <span :style="{ color: 'var(--alice-text-muted)' }">进行中</span>
             </div>
             <div class="flex items-center space-x-2">
-              <div class="w-3 h-3 bg-gray-400 rounded-full"></div>
-              <span class="text-gray-600">待完成</span>
+              <div
+                class="w-3 h-3 rounded-full"
+                :style="{ background: 'var(--chart-accent)' }"
+              ></div>
+              <span :style="{ color: 'var(--alice-text-muted)' }">待完成</span>
             </div>
           </div>
         </div>
@@ -114,30 +164,41 @@
               :size="150"
             />
 
-            <h3 :class="['mt-2 font-medium', priorityClasses[priority.level]]">
+            <h3 class="mt-2 font-medium" :style="{ color: priorityColors[priority.level] }">
               {{ priorityLabels[priority.level] }}
             </h3>
 
             <div class="mt-3 space-y-1 text-sm">
-              <div class="flex justify-between text-green-600">
-                <span>已完成:</span>
-                <span class="font-medium">{{ priority.completed }}</span>
+              <div class="flex justify-between">
+                <span :style="{ color: 'var(--chart-primary)' }">已完成:</span>
+                <span class="font-medium" :style="{ color: 'var(--chart-primary)' }">{{
+                  priority.completed
+                }}</span>
               </div>
-              <div class="flex justify-between text-orange-500">
-                <span>进行中:</span>
-                <span class="font-medium">{{ priority.inProgress }}</span>
+              <div class="flex justify-between">
+                <span :style="{ color: 'var(--chart-secondary)' }">进行中:</span>
+                <span class="font-medium" :style="{ color: 'var(--chart-secondary)' }">{{
+                  priority.inProgress
+                }}</span>
               </div>
-              <div class="flex justify-between text-gray-500">
-                <span>待完成:</span>
-                <span class="font-medium">{{ priority.remaining }}</span>
+              <div class="flex justify-between">
+                <span :style="{ color: 'var(--chart-accent)' }">待完成:</span>
+                <span class="font-medium" :style="{ color: 'var(--chart-accent)' }">{{
+                  priority.remaining
+                }}</span>
               </div>
-              <div class="border-t pt-1 mt-1 flex justify-between text-gray-700">
-                <span>总计:</span>
-                <span class="font-medium">{{ priority.total }}</span>
+              <div
+                class="border-t pt-1 mt-1 flex justify-between"
+                :style="{ borderColor: 'var(--alice-border)' }"
+              >
+                <span :style="{ color: 'var(--alice-text)' }">总计:</span>
+                <span class="font-medium" :style="{ color: 'var(--alice-text)' }">{{
+                  priority.total
+                }}</span>
               </div>
             </div>
 
-            <div class="mt-2 text-xs text-gray-500">
+            <div class="mt-2 text-xs" :style="{ color: 'var(--alice-text-muted)' }">
               完成率: {{ Math.round((priority.completed / priority.total) * 100) }}%
             </div>
           </div>
@@ -175,10 +236,10 @@ const priorityLabels = {
   low: '低优先级',
 };
 
-const priorityClasses = {
-  high: 'text-red-600',
-  medium: 'text-orange-500',
-  low: 'text-green-500',
+const priorityColors = {
+  high: 'var(--alice-primary)',
+  medium: 'var(--chart-secondary)',
+  low: 'var(--chart-accent)',
 };
 
 // 数据获取
@@ -265,7 +326,3 @@ onMounted(async () => {
   loading.value = false;
 });
 </script>
-
-<style scoped>
-/* 使用与 TodoView 和 NoteView 一致的样式 */
-</style>
