@@ -1,9 +1,8 @@
-// src/router/index.ts
 import { createRouter, createWebHistory } from 'vue-router';
 // 引入视图
 import TodoView from '@/views/TodoView.vue';
 import NoteView from '@/views/NoteView.vue';
-
+import Stats from '@/views/Stats.vue';
 const routes = [
   {
     path: '/',
@@ -22,8 +21,7 @@ const routes = [
   {
     path: '/stats',
     name: 'Stats',
-    // 懒加载占位
-    component: () => import('@/views/PlaceholderView.vue'),
+    component: Stats, // 直接使用导入的 Stats 组件
   },
   {
     path: '/tags',

@@ -11,6 +11,8 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AreaChart: typeof import('./src/components/AreaChart.vue')['default']
+    BarChart: typeof import('./src/components/BarChart.vue')['default']
     CreateItemDialog: typeof import('./src/components/CreateItemDialog.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
@@ -40,8 +42,10 @@ declare module 'vue' {
     HeaderBar: typeof import('./src/components/HeaderBar.vue')['default']
     ItemCard: typeof import('./src/components/ItemCard.vue')['default']
     PageToolbar: typeof import('./src/components/PageToolbar.vue')['default']
+    ProgressRing: typeof import('./src/components/ProgressRing.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Sidebar: typeof import('./src/components/Sidebar.vue')['default']
+    TagOverview: typeof import('./src/components/TagOverview.vue')['default']
   }
 }
