@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col h-full">
-    <el-menu :default-active="$route.path" router class="flex-1 border-r-0">
-      <el-menu-item v-for="item in menu" :key="item.path" :index="item.path">
+    <el-menu :default-active="$route.path" router class="flex-1 border-r-0" >
+      <el-menu-item v-for="item in menu" :key="item.path" :index="item.path" >
         <el-icon>
           <component :is="item.icon" />
         </el-icon>
@@ -40,5 +40,6 @@ const menu = [
   font-size: 1.35rem !important;
   margin-right: 48px !important;
   width: 24px;
+  
 }
 </style>

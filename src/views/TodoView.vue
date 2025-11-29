@@ -1,31 +1,37 @@
 <template>
-  <div class="h-full flex flex-col">
-    <header class="h-16 flex-shrink-0 border-b bg-white flex items-center justify-between px-6">
-      <h1 class="text-2xl font-semibold">TODOs</h1>
+  <div class="h-full flex flex-col p-6 overflow-y-auto ">
+    <header class="h-16 bg-white rounded-lg flex items-center justify-between px-6">
+      <h2 class="text-2xl font-semibold">TODOs</h2>
       <div class="flex items-center space-x-2">
         <el-input placeholder="搜索..." :prefix-icon="Search" class="w-60" />
-        <el-button type="danger" :icon="Delete" plain>多选删除</el-button>
         <el-button :icon="Filter">过滤</el-button>
-        <el-button :icon="Sort">排序</el-button>
+        <el-button :icon="Plus" @click="showInput = !showInput">添加</el-button>
       </div>
     </header>
 
-    <div class="flex-1 overflow-y-auto p-6">
-      <div class="mb-6">
+    <transition name="slide-fade">
+    <div v-if="showInput" class="mt-4 mb-2">
         <el-input
-          v-model="newTaskTitle"
-          placeholder="一句话快速创建任务 (例如：下午3点开会) ... 按 Enter 提交"
-          size="large"
-          @keyup.enter="handleQuickCreate"
+        v-model="newTaskTitle"
+        placeholder="一句话快速创建任务 (例如：下午3点开会) ... 按 Enter 提交"
+        size="large"
+        @keyup.enter="handleQuickCreate"
         >
-          <template #prepend>
+        <template #prepend>
             <el-icon><Plus /></el-icon>
-          </template>
+        </template>
         </el-input>
-        <el-button text class="mt-1" @click="dialogVisible = true"> 或使用手动创建... </el-button>
-      </div>
+        <el-button text class="mt-1" @click="dialogVisible = true">
+        或使用手动创建...
+        </el-button>
+    </div>
+    </transition>
 
-      <h2 class="text-lg font-semibold text-gray-700 mb-3">未完成 ({{ pendingTasks.length }})</h2>
+    <h2 
+        class="text-lg font-semibold text-gray-700 mb-3"
+        :class="{ 'mt-8': !showInput }"
+            >未完成 ({{ pendingTasks.length }})
+    </h2>
       <div v-if="pendingTasks.length > 0">
         <ItemCard
           v-for="task in pendingTasks"
@@ -53,7 +59,7 @@
     </div>
 
     <CreateItemDialog v-model="dialogVisible" type="task" @confirm="handleCreateTask" />
-  </div>
+
 </template>
 
 <script setup lang="ts">
@@ -62,7 +68,7 @@ import { ElMessage } from 'element-plus';
 import { getItems, createItem, updateItem, deleteItem } from '@/store/mockData';
 import ItemCard from '@/components/ItemCard.vue';
 import CreateItemDialog from '@/components/CreateItemDialog.vue';
-import { Search, Delete, Filter, Sort, Plus } from '@element-plus/icons-vue';
+import { Search, Filter, Plus } from '@element-plus/icons-vue';
 
 // 模拟数据
 const tasks = getItems('task');
@@ -74,13 +80,16 @@ const dialogVisible = ref(false);
 const pendingTasks = computed(() => tasks.value.filter((t) => t.status !== 'done'));
 const completedTasks = computed(() => tasks.value.filter((t) => t.status === 'done'));
 
+const showInput = ref(false)
 // 快速创建
+
 const handleQuickCreate = () => {
   if (!newTaskTitle.value.trim()) return;
   // MVP: 直接创建
   createItem({
     type: 'task',
     title: newTaskTitle.value,
+    priority: 'none',
   });
   newTaskTitle.value = '';
   ElMessage.success('快速创建成功');
@@ -119,3 +128,16 @@ const handleDeleteTask = (id: number) => {
   ElMessage.success('删除成功');
 };
 </script>
+
+<style scoped>
+/* 下滑动画 */
+.slide-fade-enter-active {
+  transition: all 0.25s ease;
+}
+.slide-fade-enter-from,
+
+/* 当输入框隐藏时加大顶距 */
+.mt-big {
+  margin-top: 32px;
+}
+</style>
