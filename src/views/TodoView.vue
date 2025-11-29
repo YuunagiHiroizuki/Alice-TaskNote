@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full flex flex-col p-6 overflow-y-auto ">
+  <div class="h-full flex flex-col p-6 overflow-y-auto">
     <header class="h-16 bg-white rounded-lg flex items-center justify-between px-6">
       <h2 class="text-2xl font-semibold">TODOs</h2>
       <div class="flex items-center space-x-2">
@@ -10,56 +10,51 @@
     </header>
 
     <transition name="slide-fade">
-    <div v-if="showInput" class="mt-4 mb-2">
+      <div v-if="showInput" class="mt-4 mb-2">
         <el-input
-        v-model="newTaskTitle"
-        placeholder="一句话快速创建任务 (例如：下午3点开会) ... 按 Enter 提交"
-        size="large"
-        @keyup.enter="handleQuickCreate"
+          v-model="newTaskTitle"
+          placeholder="一句话快速创建任务 (例如：下午3点开会) ... 按 Enter 提交"
+          size="large"
+          @keyup.enter="handleQuickCreate"
         >
-        <template #prepend>
+          <template #prepend>
             <el-icon><Plus /></el-icon>
-        </template>
+          </template>
         </el-input>
-        <el-button text class="mt-1" @click="dialogVisible = true">
-        或使用手动创建...
-        </el-button>
-    </div>
+        <el-button text class="mt-1" @click="dialogVisible = true"> 或使用手动创建... </el-button>
+      </div>
     </transition>
 
-    <h2 
-        class="text-lg font-semibold text-gray-700 mb-3"
-        :class="{ 'mt-8': !showInput }"
-            >未完成 ({{ pendingTasks.length }})
+    <h2 class="text-lg font-semibold text-gray-700 mb-3" :class="{ 'mt-8': !showInput }">
+      未完成 ({{ pendingTasks.length }})
     </h2>
-      <div v-if="pendingTasks.length > 0">
-        <ItemCard
-          v-for="task in pendingTasks"
-          :key="task.id"
-          :item="task"
-          @toggle="handleToggleStatus"
-          @delete="handleDeleteTask"
-        />
-      </div>
-      <el-empty v-else description="太棒了，全部完成了！" />
-
-      <div class="my-8 border-t border-gray-200"></div>
-
-      <h2 class="text-lg font-semibold text-gray-700 mb-3">已完成 ({{ completedTasks.length }})</h2>
-      <div v-if="completedTasks.length > 0">
-        <ItemCard
-          v-for="task in completedTasks"
-          :key="task.id"
-          :item="task"
-          @toggle="handleToggleStatus"
-          @delete="handleDeleteTask"
-        />
-      </div>
-      <el-empty v-else description="暂无已完成任务" />
+    <div v-if="pendingTasks.length > 0">
+      <ItemCard
+        v-for="task in pendingTasks"
+        :key="task.id"
+        :item="task"
+        @toggle="handleToggleStatus"
+        @delete="handleDeleteTask"
+      />
     </div>
+    <el-empty v-else description="太棒了，全部完成了！" />
 
-    <CreateItemDialog v-model="dialogVisible" type="task" @confirm="handleCreateTask" />
+    <div class="my-8 border-t border-gray-200"></div>
 
+    <h2 class="text-lg font-semibold text-gray-700 mb-3">已完成 ({{ completedTasks.length }})</h2>
+    <div v-if="completedTasks.length > 0">
+      <ItemCard
+        v-for="task in completedTasks"
+        :key="task.id"
+        :item="task"
+        @toggle="handleToggleStatus"
+        @delete="handleDeleteTask"
+      />
+    </div>
+    <el-empty v-else description="暂无已完成任务" />
+  </div>
+
+  <CreateItemDialog v-model="dialogVisible" type="task" @confirm="handleCreateTask" />
 </template>
 
 <script setup lang="ts">
@@ -80,7 +75,7 @@ const dialogVisible = ref(false);
 const pendingTasks = computed(() => tasks.value.filter((t) => t.status !== 'done'));
 const completedTasks = computed(() => tasks.value.filter((t) => t.status === 'done'));
 
-const showInput = ref(false)
+const showInput = ref(false);
 // 快速创建
 
 const handleQuickCreate = () => {
