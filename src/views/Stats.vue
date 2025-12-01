@@ -12,7 +12,7 @@
     >
       <div class="text-center">
         <div
-          class="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--alice-primary)] mx-auto"
+          class="animate-spin rounded-full h-12 w-12 border-b-2 border-(--alice-primary) mx-auto"
         ></div>
         <p class="mt-2" style="font-family: inherit; color: black">加载数据中...</p>
       </div>
@@ -44,7 +44,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-7 px-0 pt-7">
           <!-- 今日进度 -->
           <div
-            class="bg-white border border-[var(--alice-border)] rounded-lg p-7"
+            class="bg-white border border-(--alice-border) rounded-lg p-7"
             style="font-family: inherit; color: black"
           >
             <h2 class="text-lg font-semibold mb-4" style="font-family: inherit; color: black">
@@ -62,7 +62,7 @@
             <div class="mt-4 grid grid-cols-3 gap-2 text-center">
               <div style="font-family: inherit; color: black">
                 <div
-                  class="text-2xl font-bold text-[var(--chart-primary)]"
+                  class="text-2xl font-bold text-(--chart-primary)"
                   style="font-family: inherit; color: black"
                 >
                   {{ todayStats.completed }}
@@ -71,7 +71,7 @@
               </div>
               <div style="font-family: inherit; color: black">
                 <div
-                  class="text-2xl font-bold text-[var(--chart-secondary)]"
+                  class="text-2xl font-bold text-(--chart-secondary)"
                   style="font-family: inherit; color: black"
                 >
                   {{ todayStats.inProgress }}
@@ -80,7 +80,7 @@
               </div>
               <div style="font-family: inherit; color: black">
                 <div
-                  class="text-2xl font-bold text-[var(--chart-accent)]"
+                  class="text-2xl font-bold text-(--chart-accent)"
                   style="font-family: inherit; color: black"
                 >
                   {{ todayStats.remaining }}
@@ -92,7 +92,7 @@
 
           <!-- 月度总览 -->
           <div
-            class="bg-white border border-[var(--alice-border)] rounded-lg p-6"
+            class="bg-white border border-(--alice-border) rounded-lg p-6"
             style="font-family: inherit; color: black"
           >
             <h2 class="text-lg font-semibold mb-4" style="font-family: inherit; color: black">
@@ -104,7 +104,7 @@
 
         <!-- 可切换面板 -->
         <div
-          class="bg-white border border-[var(--alice-border)] rounded-lg p-6 mx-0"
+          class="bg-white border border-(--alice-border) rounded-lg p-6 mx-0"
           style="font-family: inherit; color: black"
         >
           <div class="flex justify-between items-center mb-4">
@@ -140,7 +140,7 @@
         <!-- 任务优先级分布 -->
         <div
           v-if="priorityData"
-          class="bg-white border border-[var(--alice-border)] rounded-lg p-6 mx-0"
+          class="bg-white border border-(--alice-border) rounded-lg p-6 mx-0"
           style="font-family: inherit; color: black"
         >
           <h2 class="text-lg font-semibold mb-4" style="font-family: inherit; color: black">
@@ -154,15 +154,15 @@
               style="font-family: inherit; color: black"
             >
               <div class="flex items-center space-x-2" style="font-family: inherit; color: black">
-                <div class="w-5 h-5 bg-[var(--chart-primary)] rounded-full"></div>
+                <div class="w-5 h-5 bg-(--chart-primary) rounded-full"></div>
                 <span style="font-family: inherit; color: black">已完成</span>
               </div>
               <div class="flex items-center space-x-2" style="font-family: inherit; color: black">
-                <div class="w-5 h-5 bg-[var(--chart-secondary)] rounded-full"></div>
+                <div class="w-5 h-5 bg-(--chart-secondary) rounded-full"></div>
                 <span style="font-family: inherit; color: black">进行中</span>
               </div>
               <div class="flex items-center space-x-2" style="font-family: inherit; color: black">
-                <div class="w-5 h-5 bg-[var(--chart-accent)] rounded-full"></div>
+                <div class="w-5 h-5 bg-(--chart-accent) rounded-full"></div>
                 <span style="font-family: inherit; color: black">待完成</span>
               </div>
             </div>
@@ -194,7 +194,7 @@
                 <div class="flex justify-between" style="font-family: inherit; color: black">
                   <span style="font-family: inherit; color: black">已完成:</span>
                   <span
-                    class="font-medium text-[var(--chart-primary)]"
+                    class="font-medium text-(--chart-primary)"
                     style="font-family: inherit; color: black"
                     >{{ priority.completed }}</span
                   >
@@ -202,7 +202,7 @@
                 <div class="flex justify-between" style="font-family: inherit; color: black">
                   <span style="font-family: inherit; color: black">进行中:</span>
                   <span
-                    class="font-medium text-[var(--chart-secondary)]"
+                    class="font-medium text-(--chart-secondary)"
                     style="font-family: inherit; color: black"
                     >{{ priority.inProgress }}</span
                   >
@@ -210,13 +210,13 @@
                 <div class="flex justify-between" style="font-family: inherit; color: black">
                   <span style="font-family: inherit; color: black">待完成:</span>
                   <span
-                    class="font-medium text-[var(--chart-accent)]"
+                    class="font-medium text-(--chart-accent)"
                     style="font-family: inherit; color: black"
                     >{{ priority.remaining }}</span
                   >
                 </div>
                 <div
-                  class="border-t border-[var(--alice-border)] pt-1 mt-1 flex justify-between"
+                  class="border-t border-(--alice-border) pt-1 mt-1 flex justify-between"
                   style="font-family: inherit; color: black"
                 >
                   <span style="font-family: inherit; color: black">总计:</span>
@@ -267,9 +267,9 @@ const priorityLabels = {
 };
 
 const priorityClasses = {
-  high: 'text-[var(--alice-primary)]',
-  medium: 'text-[var(--chart-secondary)]',
-  low: 'text-[var(--chart-accent)]',
+  high: 'text-(--alice-primary)',
+  medium: 'text-(--chart-secondary)',
+  low: 'text-(--chart-accent)',
 };
 
 // 数据获取
