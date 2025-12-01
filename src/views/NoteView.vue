@@ -1,4 +1,4 @@
-<template> 
+<template>
   <div class="h-full flex flex-col">
     <header class="h-16 flex-shrink-0 border-b bg-white flex items-center justify-between px-6">
       <h1 class="text-2xl font-semibold">Notes</h1>
