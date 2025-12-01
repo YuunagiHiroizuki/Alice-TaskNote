@@ -28,29 +28,31 @@
     <h2 class="text-lg font-semibold text-gray-700 mb-3" :class="{ 'mt-8': !showInput }">
       未完成 ({{ pendingTasks.length }})
     </h2>
-<div v-if="pendingTasks.length > 0">
-  <ItemCard
-    v-for="task in pendingTasks"
-    :key="task.id"
-    :item="task"
-    @toggle="handleToggleStatus"
-    @delete="handleDeleteTask"
-    @openDialog="handleOpenDialog" />
-</div>
+    <div v-if="pendingTasks.length > 0">
+      <ItemCard
+        v-for="task in pendingTasks"
+        :key="task.id"
+        :item="task"
+        @toggle="handleToggleStatus"
+        @delete="handleDeleteTask"
+        @openDialog="handleOpenDialog"
+      />
+    </div>
     <el-empty v-else description="太棒了，全部完成了！" />
 
     <div class="my-8 border-t border-gray-200"></div>
 
     <h2 class="text-lg font-semibold text-gray-700 mb-3">已完成 ({{ completedTasks.length }})</h2>
-<div v-if="completedTasks.length > 0">
-  <ItemCard
-    v-for="task in completedTasks"
-    :key="task.id"
-    :item="task"
-    @toggle="handleToggleStatus"
-    @delete="handleDeleteTask"
-    @openDialog="handleOpenDialog" />
-</div>
+    <div v-if="completedTasks.length > 0">
+      <ItemCard
+        v-for="task in completedTasks"
+        :key="task.id"
+        :item="task"
+        @toggle="handleToggleStatus"
+        @delete="handleDeleteTask"
+        @openDialog="handleOpenDialog"
+      />
+    </div>
     <el-empty v-else description="暂无已完成任务" />
   </div>
 
@@ -78,7 +80,7 @@ import { getItems, createItem, updateItem, deleteItem } from '@/store/mockData';
 import ItemCard from '@/components/ItemCard.vue';
 import CreateItemDialog from '@/components/CreateItemDialog.vue';
 import { Search, Filter, Plus } from '@element-plus/icons-vue';
-import EditTaskDialog from '@/components/EditTaskDialog.vue'; 
+import EditTaskDialog from '@/components/EditTaskDialog.vue';
 import ManageTagsDialog from '@/components/ManageTagsDialog.vue';
 import { type Item } from '@/types';
 
@@ -173,7 +175,6 @@ const handleUpdateTask = (updatedData: Partial<Item>) => {
     currentEditingItem.value = null; // 清除编辑状态
   }
 };
-
 </script>
 
 <style scoped>

@@ -6,7 +6,7 @@
     width="400px"
   >
     <p class="text-sm text-gray-500 mb-3">为任务添加或移除标签。</p>
-    
+
     <el-tag
       v-for="tag in currentTags"
       :key="tag"
@@ -17,7 +17,7 @@
     >
       {{ tag }}
     </el-tag>
-    
+
     <el-input
       v-if="inputVisible"
       ref="inputRef"
@@ -27,9 +27,7 @@
       @keyup.enter="handleInputConfirm"
       @blur="handleInputConfirm"
     />
-    <el-button v-else size="small" @click="showInput">
-      + New Tag
-    </el-button>
+    <el-button v-else size="small" @click="showInput"> + New Tag </el-button>
 
     <template #footer>
       <el-button @click="$emit('update:modelValue', false)">取消</el-button>
@@ -56,37 +54,40 @@ const inputVisible = ref(false);
 const inputRef = ref<InstanceType<typeof ElInput>>();
 
 // 初始化标签列表
-watch(() => props.item, (newItem) => {
+watch(
+  () => props.item,
+  (newItem) => {
     if (newItem && newItem.tags) {
-        currentTags.value = [...newItem.tags];
+      currentTags.value = [...newItem.tags];
     }
-}, { immediate: true });
-
+  },
+  { immediate: true }
+);
 
 const handleTagClose = (tag: string) => {
-    currentTags.value.splice(currentTags.value.indexOf(tag), 1);
+  currentTags.value.splice(currentTags.value.indexOf(tag), 1);
 };
 
 const showInput = () => {
-    inputVisible.value = true;
-    // 等待 DOM 更新后聚焦
-    setTimeout(() => {
-        inputRef.value?.input?.focus();
-    });
+  inputVisible.value = true;
+  // 等待 DOM 更新后聚焦
+  setTimeout(() => {
+    inputRef.value?.input?.focus();
+  });
 };
 
 const handleInputConfirm = () => {
-    if (inputValue.value && !currentTags.value.includes(inputValue.value)) {
-        currentTags.value.push(inputValue.value);
-    }
-    inputVisible.value = false;
-    inputValue.value = '';
+  if (inputValue.value && !currentTags.value.includes(inputValue.value)) {
+    currentTags.value.push(inputValue.value);
+  }
+  inputVisible.value = false;
+  inputValue.value = '';
 };
 
 const handleConfirm = () => {
-    // 触发 confirm 事件，只传 tags 属性
-    emit('confirm', { tags: currentTags.value });
-    // 关闭弹窗
-    emit('update:modelValue', false);
+  // 触发 confirm 事件，只传 tags 属性
+  emit('confirm', { tags: currentTags.value });
+  // 关闭弹窗
+  emit('update:modelValue', false);
 };
 </script>

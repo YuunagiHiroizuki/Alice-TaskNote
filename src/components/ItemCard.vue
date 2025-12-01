@@ -80,10 +80,11 @@
           >
 
           <el-dropdown placement="left-start" trigger="hover" class="w-full">
-            
-            <div class="flex items-center justify-between w-full px-4 py-2 text-gray-700 cursor-pointer hover:bg-blue-50 hover:text-blue-600 transition-colors">
+            <div
+              class="flex items-center justify-between w-full px-4 py-2 text-gray-700 cursor-pointer hover:bg-blue-50 hover:text-blue-600 transition-colors"
+            >
               <span class="flex items-center gap-2">
-                 <el-icon><Flag /></el-icon> 优先级
+                <el-icon><Flag /></el-icon> 优先级
               </span>
               <el-icon><ArrowRight /></el-icon>
             </div>
@@ -143,16 +144,16 @@ import {
 const props = defineProps<{ item: Item }>();
 
 const emit = defineEmits<{
-    (e: 'toggle', id: number): void;
-    (e: 'delete', id: number): void; // 用于执行删除
-    (e: 'edit', item: Item): void; // 用于打开编辑/设置日期弹窗
-    (e: 'view', id: number): void;
-    (e: 'openDialog', command: 'edit' | 'setTags' | 'setDate', item: Item): void; 
+  (e: 'toggle', id: number): void;
+  (e: 'delete', id: number): void; // 用于执行删除
+  (e: 'edit', item: Item): void; // 用于打开编辑/设置日期弹窗
+  (e: 'view', id: number): void;
+  (e: 'openDialog', command: 'edit' | 'setTags' | 'setDate', item: Item): void;
 }>();
 
 const cleanContent = (content: string) => {
-    if (!content) return '';
-    return content.replace(/^[#*->\s]+|\[.*?\]\(.*?\)/g, '').split('\n')[0] || '';
+  if (!content) return '';
+  return content.replace(/^[#*->\s]+|\[.*?\]\(.*?\)/g, '').split('\n')[0] || '';
 };
 
 // 点击内容区域，打开编辑弹窗
@@ -160,36 +161,37 @@ const handleContentClick = () => emit('openDialog', 'edit', props.item);
 
 // 2. 完善 handleCommand 逻辑
 const handleCommand = (command: string) => {
-    switch (command) {
-        case 'edit':
-        case 'setDate': // 设置日期也打开编辑弹窗，让用户修改 deadline
-            emit('openDialog', 'edit', props.item);
-            break;
-        case 'setTags':
-            emit('openDialog', 'setTags', props.item); // 打开标签管理弹窗
-            break;
-        case 'delete':
-            // 弹出确认框
-            ElMessageBox.confirm('确定要删除此项吗？', '警告', {
-                confirmButtonText: '确定删除',
-                cancelButtonText: '取消',
-                type: 'warning',
-            })
-            .then(() => {
-                emit('delete', props.item.id); // 确认后触发删除事件
-            })
-            .catch(() => {
-                // 用户点击取消或关闭弹窗
-            });
-            break;
-        default:
-            break;
-    }
+  switch (command) {
+    case 'edit':
+    case 'setDate': // 设置日期也打开编辑弹窗，让用户修改 deadline
+      emit('openDialog', 'edit', props.item);
+      break;
+    case 'setTags':
+      emit('openDialog', 'setTags', props.item); // 打开标签管理弹窗
+      break;
+    case 'delete':
+      // 弹出确认框
+      ElMessageBox.confirm('确定要删除此项吗？', '警告', {
+        confirmButtonText: '确定删除',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+        .then(() => {
+          emit('delete', props.item.id); // 确认后触发删除事件
+        })
+        .catch(() => {
+          // 用户点击取消或关闭弹窗
+        });
+      break;
+    default:
+      break;
+  }
 };
 
 // 设置优先级：逻辑保持不变，直接修改 item 属性
-const setPriority = (p: Priority) => { // 假设 Priority 是定义的类型
-    updateItem(props.item.id, { priority: p });
+const setPriority = (p: Priority) => {
+  // 假设 Priority 是定义的类型
+  updateItem(props.item.id, { priority: p });
 };
 
 // 1. 卡片背景色逻辑

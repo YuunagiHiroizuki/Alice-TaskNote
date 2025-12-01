@@ -13,7 +13,12 @@
         <el-input v-model="form.content" type="textarea" />
       </el-form-item>
       <el-form-item label="截止日期">
-        <el-date-picker v-model="form.deadline" type="date" placeholder="选择日期" style="width: 100%" />
+        <el-date-picker
+          v-model="form.deadline"
+          type="date"
+          placeholder="选择日期"
+          style="width: 100%"
+        />
       </el-form-item>
       <el-form-item label="优先级">
         <el-radio-group v-model="form.priority">
@@ -24,7 +29,7 @@
         </el-radio-group>
       </el-form-item>
     </el-form>
-    
+
     <template #footer>
       <el-button @click="$emit('update:modelValue', false)">取消</el-button>
       <el-button type="primary" @click="handleConfirm">保存</el-button>
@@ -47,22 +52,26 @@ const emit = defineEmits(['update:modelValue', 'confirm']);
 const form = ref<Partial<Item>>({});
 
 // 监听 item 变化，初始化表单
-watch(() => props.item, (newItem) => {
+watch(
+  () => props.item,
+  (newItem) => {
     if (newItem) {
-        // 复制必要的属性到表单
-        form.value = {
-            title: newItem.title,
-            content: newItem.content,
-            deadline: newItem.deadline,
-            priority: newItem.priority,
-        };
+      // 复制必要的属性到表单
+      form.value = {
+        title: newItem.title,
+        content: newItem.content,
+        deadline: newItem.deadline,
+        priority: newItem.priority,
+      };
     }
-}, { immediate: true });
+  },
+  { immediate: true }
+);
 
 const handleConfirm = () => {
-    // 触发 confirm 事件，将修改后的数据传给父组件
-    emit('confirm', form.value);
-    // 关闭弹窗
-    emit('update:modelValue', false);
+  // 触发 confirm 事件，将修改后的数据传给父组件
+  emit('confirm', form.value);
+  // 关闭弹窗
+  emit('update:modelValue', false);
 };
 </script>
