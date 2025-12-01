@@ -108,6 +108,8 @@ const handleQuickCreate = () => {
   createItem({
     type: 'task',
     title: newTaskTitle.value,
+    content: '',
+    status: 'todo',
     priority: 'none',
   });
   newTaskTitle.value = '';
@@ -125,6 +127,7 @@ const handleCreateTask = (data: {
     type: 'task',
     title: data.title,
     content: data.content,
+    status: 'todo',
     deadline: data.deadline,
     priority: data.priority,
   });
