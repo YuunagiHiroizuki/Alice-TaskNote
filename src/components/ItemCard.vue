@@ -126,7 +126,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { type Item, type Priority } from '@/types';
-import { type Item } from '@/types';
 import { updateItem } from '@/store/mockData';
 import { ElMessageBox } from 'element-plus';
 import {
