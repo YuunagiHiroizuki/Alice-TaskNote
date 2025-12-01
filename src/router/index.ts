@@ -4,6 +4,7 @@ import TodoView from '@/views/TodoView.vue';
 import NoteView from '@/views/NoteView.vue';
 import Stats from '@/views/Stats.vue';
 import TagsView from '../views/TagsView.vue';
+import PlaceholderView from '@/views/PlaceholderView.vue';
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
@@ -16,8 +17,8 @@ const routes: RouteRecordRaw[] = [
     component: NoteView,
   },
   {
-    path: '/todo',
-    name: 'TODO',
+    path: '/todos',
+    name: 'TODOs',
     component: TodoView,
   },
   {
@@ -29,6 +30,11 @@ const routes: RouteRecordRaw[] = [
     path: '/tags',
     name: 'Tags',
     component: TagsView,
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: PlaceholderView,
   },
 ];
 

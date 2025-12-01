@@ -9,10 +9,10 @@
       </el-menu-item>
     </el-menu>
 
-    <el-menu class="border-r-0">
-      <el-menu-item index="/setting">
+    <el-menu :default-active="$route.path" router class="border-r-0">
+      <el-menu-item index="/settings">
         <el-icon><Setting /></el-icon>
-        <span>Setting</span>
+        <span>Settings</span>
       </el-menu-item>
     </el-menu>
   </div>
@@ -23,7 +23,7 @@ import { Notebook, Checked, DataLine, PriceTag, Setting } from '@element-plus/ic
 
 const menu = [
   { name: 'Notes', path: '/notes', icon: Notebook },
-  { name: 'TODO', path: '/todo', icon: Checked },
+  { name: 'TODOs', path: '/todos', icon: Checked },
   { name: 'Stats', path: '/stats', icon: DataLine },
   { name: 'Tags', path: '/tags', icon: PriceTag },
 ];
