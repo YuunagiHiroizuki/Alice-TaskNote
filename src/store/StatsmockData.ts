@@ -1,4 +1,4 @@
-// src/store/mockData.ts
+// src/store/StatsmockData.ts
 import { ref, computed } from 'vue';
 import type { Item } from '@/types';
 
@@ -62,6 +62,39 @@ const MOCK_ITEMS: Item[] = [
   },
 ];
 
+// 统计数据的模拟数据
+export const MOCK_STATS_DATA = {
+  today: { completed: 8, inProgress: 3, remaining: 2, total: 13 },
+  week: [
+    { day: '周一', completed: 1, inProgress: 1, remaining: 1 },
+    { day: '周二', completed: 2, inProgress: 1, remaining: 0 },
+    { day: '周三', completed: 1, inProgress: 1, remaining: 1 },
+    { day: '周四', completed: 0, inProgress: 2, remaining: 1 },
+    { day: '周五', completed: 3, inProgress: 0, remaining: 1 },
+    { day: '周六', completed: 1, inProgress: 1, remaining: 1 },
+    { day: '周日', completed: 4, inProgress: 1, remaining: 0 },
+  ],
+  month: Array.from({ length: 30 }, (_, i) => ({
+    label: `${i + 1}日`,
+    completed: Math.floor(Math.random() * 5) + 1,
+    inProgress: Math.floor(Math.random() * 3) + 1,
+    remaining: Math.floor(Math.random() * 4) + 1,
+  })),
+  year: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'].map(
+    (month) => ({
+      label: month,
+      completed: Math.floor(Math.random() * 15) + 5,
+      inProgress: Math.floor(Math.random() * 8) + 2,
+      remaining: Math.floor(Math.random() * 5) + 1,
+    })
+  ),
+  priority: [
+    { level: 'high', completed: 8, inProgress: 3, remaining: 2, total: 13 },
+    { level: 'medium', completed: 12, inProgress: 5, remaining: 4, total: 21 },
+    { level: 'low', completed: 15, inProgress: 2, remaining: 8, total: 25 },
+  ],
+};
+
 // ------------------------------------
 // 模拟的 API 服务
 // ------------------------------------
@@ -87,24 +120,21 @@ export const getItemById = (id: number) => {
 };
 
 // 创建 (Create)
-export const createItem = (newItemData: Partial<Item>): Item => {
-  const id = typeof newItemData.id === 'number' ? newItemData.id : nextId++;
+export const createItem = (
+  newItemData: Omit<Item, 'id' | 'created_at' | 'isPinned' | 'tags'> & { tags?: string[] }
+) => {
   const newItem: Item = {
-    id,
-    type: (newItemData.type as Item['type']) || 'task',
-    title: newItemData.title || '未命名',
+    ...newItemData,
+    id: nextId++,
     content: newItemData.content || '',
     tags: newItemData.tags || [],
-    priority: (newItemData.priority as Item['priority']) || 'medium',
-    status: (newItemData.status as Item['status']) || 'todo',
-    deadline: newItemData.deadline || '',
-    created_at: newItemData.created_at || new Date().toISOString(),
-    isPinned: !!newItemData.isPinned,
+    priority: newItemData.priority || 'medium',
+    status: newItemData.status || 'todo',
+    created_at: new Date().toISOString(),
+    isPinned: false,
   };
-  // 将新项放到头部（保持和之前一致）
   items.value.unshift(newItem);
   console.log('Created:', newItem);
-  return newItem;
 };
 
 // 更新 (Update)
