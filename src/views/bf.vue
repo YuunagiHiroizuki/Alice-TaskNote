@@ -147,27 +147,3 @@ const handleTogglePin = (id: number) => {
   updateItem(id, { isPinned: !item.isPinned });
 };
 </script>
-
-<style>
-/* Markdown 渲染样式 */
-.prose {
-  max-width: 100%;
-}
-.prose h1,
-.prose h2,
-.prose h3 {
-  font-weight: 600;
-}
-.prose p {
-  margin: 1em 0;
-}
-.prose ul {
-  list-style: disc;
-  margin-left: 1.5em;
-}
-.prose pre {
-  background-color: #f4f4f5;
-  padding: 1em;
-  border-radius: 4px;
-}
-</style>
