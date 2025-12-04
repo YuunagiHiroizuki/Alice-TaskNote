@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} */
+@type {import('tailwindcss').Config} 
 export default {
   content: [
     "./index.html",
@@ -7,8 +7,8 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/typography')],
   corePlugins: {
-    preflight: false // **重要**: 防止Tailwind重置Element Plus的样式
+    preflight: false
   }
 }
