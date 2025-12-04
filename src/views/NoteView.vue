@@ -61,7 +61,7 @@
             ></textarea>
           </div>
 
-          <div class="w-1/2 h-full bg-white overflow-y-auto p-8">
+          <div class="w-1/2 h-full bg-white overflow-y-auto px-8 pb-8 pt-0">
             <div class="prose prose-slate max-w-none" v-html="renderMarkdown(editContent)"></div>
           </div>
         </div>
