@@ -61,7 +61,7 @@
             ></textarea>
           </div>
 
-          <div class="w-1/2 h-full bg-white overflow-y-auto p-8">
+          <div class="w-1/2 h-full bg-white overflow-y-auto px-8 pb-8 pt-0">
             <div class="prose prose-slate max-w-none" v-html="renderMarkdown(editContent)"></div>
           </div>
         </div>
@@ -267,68 +267,5 @@ textarea::-webkit-scrollbar-thumb,
 textarea::-webkit-scrollbar-thumb:hover,
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background-color: #d1d5db;
-}
-
-/* 简单的 Prose 样式覆盖 (如果你没有安装 @tailwindcss/typography 插件) */
-.prose h1 {
-  font-size: 2em;
-  font-weight: bold;
-  margin-bottom: 0.5em;
-}
-.prose h2 {
-  font-size: 1.5em;
-  font-weight: bold;
-  margin-top: 1em;
-  margin-bottom: 0.5em;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 0.3em;
-}
-.prose h3 {
-  font-size: 1.25em;
-  font-weight: bold;
-  margin-top: 1em;
-  margin-bottom: 0.5em;
-}
-.prose p {
-  margin-bottom: 1em;
-  line-height: 1.6;
-}
-.prose ul {
-  list-style-type: disc;
-  padding-left: 1.5em;
-  margin-bottom: 1em;
-}
-.prose ol {
-  list-style-type: decimal;
-  padding-left: 1.5em;
-  margin-bottom: 1em;
-}
-.prose blockquote {
-  border-left: 4px solid #e5e7eb;
-  padding-left: 1em;
-  color: #6b7280;
-  font-style: italic;
-}
-.prose pre {
-  background: #f3f4f6;
-  padding: 1em;
-  border-radius: 0.5em;
-  overflow-x: auto;
-  font-family: monospace;
-}
-.prose code {
-  background: #f3f4f6;
-  padding: 0.2em 0.4em;
-  border-radius: 0.25em;
-  font-family: monospace;
-  font-size: 0.9em;
-}
-.prose img {
-  max-width: 100%;
-  border-radius: 0.5em;
-}
-.prose a {
-  color: #3b82f6;
-  text-decoration: underline;
 }
 </style>
