@@ -8,7 +8,6 @@
         <el-button :icon="Plus" @click="showInput = !showInput">添加</el-button>
       </div>
     </header>
-
     <transition name="slide-fade">
       <div v-if="showInput" class="mt-4 mb-2">
         <el-input
@@ -24,7 +23,6 @@
         <el-button text class="mt-1" @click="dialogVisible = true"> 或使用手动创建... </el-button>
       </div>
     </transition>
-
     <h2 class="text-lg font-semibold text-gray-700 mb-3" :class="{ 'mt-8': !showInput }">
       未完成 ({{ pendingTasks.length }})
     </h2>
@@ -39,32 +37,27 @@
       />
     </div>
     <el-empty v-else description="太棒了，全部完成了！" />
-
     <div class="my-8 border-t border-gray-200"></div>
-
     <h2 class="text-lg font-semibold text-gray-700 mb-3">已完成 ({{ completedTasks.length }})</h2>
     <div v-if="completedTasks.length > 0">
       <ItemCard
         v-for="task in completedTasks"
         :key="task.id"
         :item="task"
-        @toggle="handleToggleStatus"
+        @toggle-pin="handleToggleStatus"
         @delete="handleDeleteTask"
         @openDialog="handleOpenDialog"
       />
     </div>
     <el-empty v-else description="暂无已完成任务" />
   </div>
-
   <CreateItemDialog v-model="dialogVisible" type="task" @confirm="handleCreateTask" />
-
   <EditTaskDialog
     v-if="currentEditingItem"
     v-model="isEditDialogOpen"
     :item="currentEditingItem"
     @confirm="handleUpdateTask"
   />
-
   <ManageTagsDialog
     v-if="currentEditingItem"
     v-model="isTagsDialogOpen"
@@ -74,9 +67,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
-import { getItems, createItem, updateItem, deleteItem } from '@/store/mockData';
+import { fetchTasks, createTask, updateTask, deleteTask } from '@/api/task';
 import ItemCard from '@/components/ItemCard.vue';
 import CreateItemDialog from '@/components/CreateItemDialog.vue';
 import { Search, Filter, Plus } from '@element-plus/icons-vue';
@@ -84,127 +77,160 @@ import EditTaskDialog from '@/components/EditTaskDialog.vue';
 import ManageTagsDialog from '@/components/ManageTagsDialog.vue';
 import { type Item } from '@/types';
 
-// 模拟数据
-const tasks = getItems('task');
+const tasks = ref<Item[]>([]);
+
 const newTaskTitle = ref('');
 const dialogVisible = ref(false);
-
-// 新增状态：用于控制编辑和标签弹窗
 const isEditDialogOpen = ref(false);
 const isTagsDialogOpen = ref(false);
-// 存储当前正在编辑的 Item 对象
 const currentEditingItem = ref<Item | null>(null);
+const showInput = ref(false);
 
-// 计算属性分离列表
+const loadTasks = async () => {
+  try {
+    // 调用后端接口获取所有任务
+    const res = await fetchTasks();
+    tasks.value = res as Item[];
+  } catch (error) {
+    ElMessage.error('加载任务失败，请刷新重试');
+    console.error('加载任务错误：', error);
+  }
+};
+// 页面挂载时加载任务
+onMounted(() => loadTasks());
+
 const pendingTasks = computed(() =>
   tasks.value
     .filter((t) => t.status !== 'done')
     .sort((a, b) => Number(b.isPinned) - Number(a.isPinned))
 );
-
 const completedTasks = computed(() =>
   tasks.value
     .filter((t) => t.status === 'done')
     .sort((a, b) => Number(b.isPinned) - Number(a.isPinned))
 );
 
-const showInput = ref(false);
-// 快速创建
-const handleQuickCreate = () => {
+const handleQuickCreate = async () => {
   if (!newTaskTitle.value.trim()) return;
-  // MVP: 直接创建
-  createItem({
-    type: 'task',
-    title: newTaskTitle.value,
-    content: '',
-    status: 'todo',
-    priority: 'none',
-  });
-  newTaskTitle.value = '';
-  ElMessage.success('快速创建成功');
+  try {
+    // 调用后端创建任务接口
+    await createTask({
+      type: 'task',
+      title: newTaskTitle.value,
+      content: '',
+      status: 'todo',
+      priority: 'none',
+      tags: [], // 对齐后端 tags 字段（空数组避免 undefined）
+    });
+    newTaskTitle.value = '';
+    ElMessage.success('快速创建成功');
+    loadTasks(); // 刷新任务列表
+  } catch (error) {
+    ElMessage.error('快速创建失败，请重试');
+    console.error('快速创建任务错误：', error);
+  }
 };
 
-// 详细创建
-const handleCreateTask = (data: {
+const handleCreateTask = async (data: {
   title: string;
   content: string;
   deadline: string;
   priority: 'high' | 'medium' | 'low';
 }) => {
-  createItem({
-    type: 'task',
-    title: data.title,
-    content: data.content,
-    status: 'todo',
-    deadline: data.deadline,
-    priority: data.priority,
-  });
-  ElMessage.success('任务创建成功');
-  dialogVisible.value = false;
-};
+  try {
+    const utcDeadline = data.deadline
+      ? new Date(data.deadline + 'T00:00:00').toISOString()
+      : undefined;
 
-// 切换状态
-const handleToggleStatus = (id: number) => {
-  const task = tasks.value.find((t) => t.id === id);
-  if (task) {
-    const newStatus = task.status === 'done' ? 'todo' : 'done';
-    updateItem(id, { status: newStatus });
+    await createTask({
+      type: 'task',
+      title: data.title,
+      content: data.content,
+      status: 'todo',
+      deadline: utcDeadline || undefined,
+      priority: data.priority,
+      tags: [],
+    });
+    ElMessage.success('任务创建成功');
+    dialogVisible.value = false;
+    loadTasks(); // 刷新任务列表
+  } catch (error) {
+    ElMessage.error('创建任务失败，请重试');
+    console.error('详细创建任务错误：', error);
   }
 };
 
-// 删除
-const handleDeleteTask = (id: number) => {
-  deleteItem(id);
-  ElMessage.success('删除成功');
+const handleToggleStatus = async (id: number) => {
+  const task = tasks.value.find((t) => t.id === id);
+  if (!task) return;
+
+  const newStatus = task.status === 'done' ? 'todo' : 'done';
+  try {
+    // 调用后端更新任务状态接口
+    await updateTask(id, { status: newStatus });
+    ElMessage.success(`任务已${newStatus === 'done' ? '完成' : '恢复待完成'}`);
+    loadTasks(); // 刷新任务列表
+  } catch (error) {
+    ElMessage.error('更新状态失败，请重试');
+    console.error('切换任务状态错误：', error);
+  }
 };
 
-/**
- * 响应 ItemCard 的 openDialog 事件，设置要编辑的对象并打开对应的弹窗。
- */
+// 👇 替换：删除任务（对接后端接口）
+const handleDeleteTask = async (id: number) => {
+  try {
+    // 调用后端删除任务接口
+    await deleteTask(id);
+    ElMessage.success('删除成功');
+    loadTasks(); // 刷新任务列表
+  } catch (error) {
+    ElMessage.error('删除失败，请重试');
+    console.error('删除任务错误：', error);
+  }
+};
+
 const handleOpenDialog = (command: 'edit' | 'setTags' | 'setDate', item: Item) => {
   currentEditingItem.value = item;
   if (command === 'edit' || command === 'setDate') {
-    // “编辑”和“设置日期”都指向同一个详细编辑弹窗
     isEditDialogOpen.value = true;
   } else if (command === 'setTags') {
-    // “管理标签”指向标签管理弹窗
     isTagsDialogOpen.value = true;
   }
 };
 
-/**
- * 处理编辑弹窗或标签弹窗返回的更新数据。
- */
-const handleUpdateTask = (updatedData: Partial<Item>) => {
+const handleUpdateTask = async (updatedData: Partial<Item>) => {
   if (!currentEditingItem.value) return;
 
-  const mergedData = { ...updatedData };
+  const mergedData: Partial<Item> = { ...updatedData };
 
-  // 如果是标签更新，保留原来的标签并合并去重
+  // 标签合并（保持你的逻辑）
   if (updatedData.tags) {
     const oldTags = currentEditingItem.value.tags || [];
     const newTags = updatedData.tags || [];
     mergedData.tags = Array.from(new Set([...oldTags, ...newTags]));
   }
 
-  updateItem(currentEditingItem.value.id, mergedData);
-  ElMessage.success('任务更新成功');
+  try {
+    await updateTask(currentEditingItem.value.id, mergedData);
+    ElMessage.success('任务更新成功');
 
-  // 关闭弹窗
-  isEditDialogOpen.value = false;
-  isTagsDialogOpen.value = false;
-  currentEditingItem.value = null;
+    isEditDialogOpen.value = false;
+    isTagsDialogOpen.value = false;
+    currentEditingItem.value = null;
+
+    loadTasks();
+  } catch (error) {
+    ElMessage.error('更新任务失败，请重试');
+    console.error(error);
+  }
 };
 </script>
 
 <style scoped>
-/* 下滑动画 */
 .slide-fade-enter-active {
   transition: all 0.25s ease;
 }
 .slide-fade-enter-from,
-
-/* 当输入框隐藏时加大顶距 */
 .mt-big {
   margin-top: 32px;
 }

@@ -13,6 +13,7 @@
     "@bytemd/plugin-highlight": "^1.22.0",
     "@bytemd/vue-next": "^1.22.0",
     "@kangc/v-md-editor": "^1.7.12",
+    "axios": "^1.13.2",
     "bytemd": "^1.22.0",
     "chart.js": "^4.5.1",
     "element-plus": "^2.11.7",
