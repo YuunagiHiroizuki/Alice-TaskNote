@@ -1,12 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router';
-// 引入视图
+import type { RouteRecordRaw } from 'vue-router';
 import TodoView from '@/views/TodoView.vue';
 import NoteView from '@/views/NoteView.vue';
 import Stats from '@/views/Stats.vue';
-const routes = [
+import TagsView from '../views/TagsView.vue';
+import PlaceholderView from '@/views/PlaceholderView.vue';
+const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    redirect: '/notes', // 默认重定向到笔记
+    name: 'Root',
+    redirect: '/notes',
   },
   {
     path: '/notes',
@@ -14,19 +17,24 @@ const routes = [
     component: NoteView,
   },
   {
-    path: '/todo',
-    name: 'TODO',
+    path: '/todos',
+    name: 'TODOs',
     component: TodoView,
   },
   {
     path: '/stats',
     name: 'Stats',
-    component: Stats, // 直接使用导入的 Stats 组件
+    component: Stats,
   },
   {
     path: '/tags',
     name: 'Tags',
-    component: () => import('@/views/PlaceholderView.vue'),
+    component: TagsView,
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: PlaceholderView,
   },
 ];
 
