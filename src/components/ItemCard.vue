@@ -50,11 +50,11 @@
           <span v-if="item.deadline || item.isPinned" class="text-gray-300">|</span>
           <span
             v-for="tag in item.tags"
-            :key="tag"
+            :key="typeof tag === 'object' ? tag.id : tag"
             class="text-gray-500 hover:text-blue-600 transition-colors flex items-center gap-0.5"
           >
             <el-icon class="scale-75"><PriceTag /></el-icon>
-            {{ tag }}
+            {{ typeof tag === 'object' ? tag.name : tag }}
           </span>
         </div>
 
@@ -194,6 +194,9 @@ import {
   MoreFilled,
   Delete,
   Edit,
+  Unlock,
+  Warning,
+  Scissor,
   Operation,
   Top,
   Lock,

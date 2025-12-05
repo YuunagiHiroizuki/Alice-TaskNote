@@ -11,7 +11,7 @@ export interface Item {
   type: 'task' | 'note';
   title: string;
   content: string; // Markdown内容
-  tags: string[];
+  tags: Tag[] | string[];
   priority: Priority;
   status: 'todo' | 'doing' | 'done';
   deadline?: string;
@@ -20,4 +20,16 @@ export interface Item {
 
   // 新增：你的组件已使用
   subTasks?: SubTask[];
+}
+
+export interface Tag {
+  id: number;
+  name: string;
+  color?: string;
+}
+
+export interface SubTask {
+  id: number;
+  title: string;
+  done: boolean;
 }

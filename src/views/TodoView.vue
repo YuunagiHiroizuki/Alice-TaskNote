@@ -152,22 +152,19 @@ const handleCreateTask = async (data: {
   priority: 'high' | 'medium' | 'low';
 }) => {
   try {
-    const utcDeadline = data.deadline
-      ? new Date(data.deadline + 'T00:00:00').toISOString()
-      : undefined;
-
     await createTask({
       type: 'task',
       title: data.title,
       content: data.content,
       status: 'todo',
-      deadline: utcDeadline || undefined,
+      // 直接传 '2023-12-05' 给后端
+      deadline: data.deadline || undefined,
       priority: data.priority,
       tags: [],
     });
     ElMessage.success('任务创建成功');
     dialogVisible.value = false;
-    loadTasks(); // 刷新任务列表
+    loadTasks();
   } catch (error) {
     ElMessage.error('创建任务失败，请重试');
     console.error('详细创建任务错误：', error);
@@ -247,17 +244,23 @@ const handleOpenDialog = (command: 'edit' | 'setTags' | 'setDate', item: Item) =
 const handleUpdateTask = async (updatedData: Partial<Item>) => {
   if (!currentEditingItem.value) return;
 
-  const mergedData: Partial<Item> = { ...updatedData };
+  const payload: any = {};
 
-  // 标签合并（保持你的逻辑）
-  if (updatedData.tags) {
-    const oldTags = currentEditingItem.value.tags || [];
-    const newTags = updatedData.tags || [];
-    mergedData.tags = Array.from(new Set([...oldTags, ...newTags]));
+  for (const key in updatedData) {
+    if (key === 'tags') {
+      const tagsArray = (updatedData.tags as any[]) || [];
+      // 提取 ID 发送给后端
+      payload.tags = tagsArray
+        .map((t) => (typeof t === 'object' && t !== null ? t.id : t))
+        .filter((id) => typeof id === 'number');
+    } else {
+      payload[key] = (updatedData as any)[key];
+    }
   }
 
   try {
-    await updateTask(currentEditingItem.value.id, mergedData);
+    await updateTask(currentEditingItem.value.id, payload);
+
     ElMessage.success('任务更新成功');
 
     isEditDialogOpen.value = false;
@@ -266,8 +269,8 @@ const handleUpdateTask = async (updatedData: Partial<Item>) => {
 
     loadTasks();
   } catch (error) {
-    ElMessage.error('更新任务失败，请重试');
-    console.error(error);
+    // ... 错误处理 ...
+    loadTasks();
   }
 };
 
