@@ -4,7 +4,14 @@
       <header class="h-16 bg-white rounded-lg flex items-center justify-between px-6 mb-8 shrink-0">
         <h2 class="text-2xl font-semibold">Notes</h2>
         <div class="flex items-center space-x-2">
-          <el-input placeholder="搜索..." :prefix-icon="Search" class="w-60" />
+          <el-input
+            v-model="searchKeyword"
+            placeholder="搜索..."
+            :prefix-icon="Search"
+            class="w-60"
+            @input="handleSearch"
+            clearable
+          />
           <el-button :icon="Plus" type="primary" @click="handleCreateNote"> 新建 </el-button>
         </div>
       </header>
@@ -13,7 +20,7 @@
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-auto pb-4"
       >
         <ItemCard
-          v-for="note in notes"
+          v-for="note in filteredNotes"
           :key="note.id"
           :item="note"
           @openDialog="
@@ -29,7 +36,7 @@
           @togglePin="handleTogglePin"
         />
       </div>
-      <el-empty v-if="notes.length === 0" description="暂无笔记" />
+      <el-empty v-if="filteredNotes.length === 0" description="暂无笔记" />
     </div>
 
     <transition name="el-fade-in-linear">
@@ -79,19 +86,50 @@
 
 <script setup lang="ts">
 import ManageTagsDialog from '@/components/ManageTagsDialog.vue';
-import { ref, computed, watch, nextTick, onMounted } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-// 假设 mockData 导出了这些函数
 import { getItems, createItem, updateItem, deleteItem, getItemById } from '@/store/mockData';
 import ItemCard from '@/components/ItemCard.vue';
 import { Search, Plus, Close } from '@element-plus/icons-vue';
 import { marked } from 'marked';
 
+// 搜索关键词
+const searchKeyword = ref('');
+
+// 获取所有笔记
 const notesRef = getItems('note');
 
-const notes = computed(() =>
-  notesRef.value.slice().sort((a, b) => Number(b.isPinned) - Number(a.isPinned))
-);
+// 过滤后的笔记列表
+const filteredNotes = computed(() => {
+  const notes = notesRef.value.slice().sort((a, b) => Number(b.isPinned) - Number(a.isPinned));
+
+  if (!searchKeyword.value.trim()) {
+    return notes;
+  }
+
+  const keyword = searchKeyword.value.toLowerCase().trim();
+  return notes.filter((note) => {
+    // 搜索标题
+    if (note.title && note.title.toLowerCase().includes(keyword)) {
+      return true;
+    }
+    // 搜索内容
+    if (note.content && note.content.toLowerCase().includes(keyword)) {
+      return true;
+    }
+    // 搜索标签
+    if (note.tags && note.tags.length > 0) {
+      return note.tags.some((tag) => tag.toLowerCase().includes(keyword));
+    }
+    return false;
+  });
+});
+
+// 搜索处理函数
+const handleSearch = () => {
+  // 搜索逻辑已经在 computed 属性中实现
+  // 可以在这里添加防抖或其他优化
+};
 
 // 状态管理
 const drawerVisible = ref(false);
@@ -104,7 +142,6 @@ const isUnsaved = ref(false);
 const currentNote = computed(() => {
   if (currentNoteId.value === null) return null;
   const itemRef = getItemById(currentNoteId.value);
-  // 确保找到了笔记对象 (itemRef.value 才是实际对象)
   return itemRef.value ? itemRef.value : null;
 });
 
@@ -130,14 +167,12 @@ const renderMarkdown = (md: string) => {
 const handleViewNote = (id: number) => {
   const targetNote = getItemById(id).value;
   if (targetNote) {
-    // 关键：如果找到了笔记，就打开
     currentNoteId.value = id;
     editTitle.value = targetNote.title;
     editContent.value = targetNote.content;
     isUnsaved.value = false;
     drawerVisible.value = true;
   } else {
-    // 如果点卡片打不开，这里会提示错误
     ElMessage.error('无法找到该笔记，可能数据已损坏或丢失。');
   }
 };
@@ -173,7 +208,6 @@ const handleCreateNote = async () => {
     tags: [] as string[],
     priority: 'medium' as const,
     status: 'done' as const,
-    // created_at 可以不传，mockData 会自动加
     isPinned: false,
   };
 
@@ -232,6 +266,7 @@ const handleTogglePin = (id: number) => {
 
 const isTagsDialogOpen = ref(false);
 const currentEditingNote = ref<(typeof notesRef.value)[0] | null>(null);
+
 // 打开管理标签对话框
 const handleSetTags = (note: (typeof notesRef.value)[0]) => {
   currentEditingNote.value = note;
@@ -240,7 +275,6 @@ const handleSetTags = (note: (typeof notesRef.value)[0]) => {
 
 const handleUpdateNoteTags = (updatedData: Partial<(typeof notesRef.value)[0]>) => {
   if (currentEditingNote.value) {
-    // 只更新 tags
     updateItem(currentEditingNote.value.id, { tags: updatedData.tags });
     currentEditingNote.value = null;
     isTagsDialogOpen.value = false;
