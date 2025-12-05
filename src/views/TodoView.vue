@@ -10,7 +10,13 @@
           v-model="searchQuery"
           @keyup.enter="handleSearch"
         />
-        <el-button :icon="Filter">过滤</el-button>
+        <el-button
+          :icon="Filter"
+          @click="toggleFilterSearch"
+          :type="isFilterActive ? 'primary' : 'default'"
+        >
+          过滤
+        </el-button>
         <el-button :icon="Plus" @click="showInput = !showInput">添加</el-button>
       </div>
     </header>
@@ -96,6 +102,8 @@ const isTagsDialogOpen = ref(false);
 const currentEditingItem = ref<Item | null>(null);
 const showInput = ref(false);
 
+const isFilterActive = ref(false);
+
 const loadTasks = async (query?: string) => {
   try {
     let res;
@@ -152,22 +160,19 @@ const handleCreateTask = async (data: {
   priority: 'high' | 'medium' | 'low';
 }) => {
   try {
-    const utcDeadline = data.deadline
-      ? new Date(data.deadline + 'T00:00:00').toISOString()
-      : undefined;
-
     await createTask({
       type: 'task',
       title: data.title,
       content: data.content,
       status: 'todo',
-      deadline: utcDeadline || undefined,
+      // 直接传 '2023-12-05' 给后端
+      deadline: data.deadline || undefined,
       priority: data.priority,
       tags: [],
     });
     ElMessage.success('任务创建成功');
     dialogVisible.value = false;
-    loadTasks(); // 刷新任务列表
+    loadTasks();
   } catch (error) {
     ElMessage.error('创建任务失败，请重试');
     console.error('详细创建任务错误：', error);
@@ -247,17 +252,23 @@ const handleOpenDialog = (command: 'edit' | 'setTags' | 'setDate', item: Item) =
 const handleUpdateTask = async (updatedData: Partial<Item>) => {
   if (!currentEditingItem.value) return;
 
-  const mergedData: Partial<Item> = { ...updatedData };
+  const payload: any = {};
 
-  // 标签合并（保持你的逻辑）
-  if (updatedData.tags) {
-    const oldTags = currentEditingItem.value.tags || [];
-    const newTags = updatedData.tags || [];
-    mergedData.tags = Array.from(new Set([...oldTags, ...newTags]));
+  for (const key in updatedData) {
+    if (key === 'tags') {
+      const tagsArray = (updatedData.tags as any[]) || [];
+      // 提取 ID 发送给后端
+      payload.tags = tagsArray
+        .map((t) => (typeof t === 'object' && t !== null ? t.id : t))
+        .filter((id) => typeof id === 'number');
+    } else {
+      payload[key] = (updatedData as any)[key];
+    }
   }
 
   try {
-    await updateTask(currentEditingItem.value.id, mergedData);
+    await updateTask(currentEditingItem.value.id, payload);
+
     ElMessage.success('任务更新成功');
 
     isEditDialogOpen.value = false;
@@ -266,8 +277,42 @@ const handleUpdateTask = async (updatedData: Partial<Item>) => {
 
     loadTasks();
   } catch (error) {
-    ElMessage.error('更新任务失败，请重试');
-    console.error(error);
+    // ... 错误处理 ...
+    loadTasks();
+  }
+};
+
+const handleSearch = () => {
+  const query = searchQuery.value.trim();
+  loadTasks(query);
+  if (query) {
+    isFilterActive.value = true;
+  } else {
+    isFilterActive.value = false;
+  }
+};
+
+const toggleFilterSearch = () => {
+  // 情况 1: 当前非激活状态，且搜索框有内容 -> 执行搜索并激活按钮
+  if (!isFilterActive.value && searchQuery.value.trim()) {
+    isFilterActive.value = true;
+    handleSearch();
+  }
+  // 情况 2: 当前是激活状态 -> 重置搜索，并取消激活按钮
+  else if (isFilterActive.value) {
+    isFilterActive.value = false;
+    searchQuery.value = '';
+    handleSearch();
+  }
+  // 情况 3: 当前非激活状态，且搜索框无内容 -> 不做任何操作
+};
+
+onMounted(() => loadTasks());
+
+const resetSearch = () => {
+  if (searchQuery.value) {
+    searchQuery.value = '';
+    loadTasks();
   }
 };
 

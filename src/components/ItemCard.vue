@@ -50,11 +50,11 @@
           <span v-if="item.deadline || item.isPinned" class="text-gray-300">|</span>
           <span
             v-for="tag in item.tags"
-            :key="tag"
+            :key="typeof tag === 'object' ? tag.id : tag"
             class="text-gray-500 hover:text-blue-600 transition-colors flex items-center gap-0.5"
           >
             <el-icon class="scale-75"><PriceTag /></el-icon>
-            {{ tag }}
+            {{ typeof tag === 'object' ? tag.name : tag }}
           </span>
         </div>
 
@@ -194,6 +194,9 @@ import {
   MoreFilled,
   Delete,
   Edit,
+  Unlock,
+  Warning,
+  Scissor,
   Operation,
   Top,
   Lock,
@@ -282,15 +285,13 @@ const formatDate = (dateStr: string) => {
   if (isNaN(date.getTime())) return '无效日期';
 
   const today = new Date();
-  // 关键：将日期转换为UTC时间进行比较（避免时区影响）
-  const dateUTC = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-  const todayUTC = new Date(
-    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
-  );
+  // 改用本地时间比较（移除 UTC 方法）
+  const targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-  const isToday = dateUTC.getTime() === todayUTC.getTime();
-  // 按UTC时间格式化显示（月/日）
-  return isToday ? '今天' : `${date.getUTCMonth() + 1}月${date.getUTCDate()}日`;
+  const isToday = targetDate.getTime() === todayDate.getTime();
+  // 用本地时间格式化
+  return isToday ? '今天' : `${date.getMonth() + 1}月${date.getDate()}日`;
 };
 
 const dateStatusClass = computed(() => {
