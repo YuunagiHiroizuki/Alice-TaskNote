@@ -326,35 +326,56 @@ const handleTogglePin = async (item: Note) => {
   }
 };
 
-// 打开管理标签对话框
+// 静态标签数据
+const staticTags = ref([
+  { id: 1, name: '工作', color: '#3498db' },
+  { id: 2, name: '学习', color: '#2ecc71' },
+  { id: 3, name: '生活', color: '#e74c3c' },
+  { id: 4, name: '重要', color: '#f39c12' },
+  { id: 5, name: '待办', color: '#9b59b6' },
+  { id: 6, name: '参考', color: '#1abc9c' },
+  { id: 7, name: '想法', color: '#34495e' },
+  { id: 8, name: '项目', color: '#d35400' },
+]);
+
+// 修改 handleSetTags 函数，使用静态标签
 const handleSetTags = (note: Note) => {
   currentEditingNote.value = note;
   isTagsDialogOpen.value = true;
 };
 
-// 更新标签
+// 修改标签更新逻辑，只在前端操作
 const handleUpdateNoteTags = async (updatedData: any) => {
   if (!currentEditingNote.value) return;
 
   try {
     const tagIds = updatedData.tags?.map((tag: any) => tag.id) || [];
-    await notesApi.updateNoteTags(currentEditingNote.value.id, tagIds);
 
-    ElMessage.success('标签更新成功');
+    // 前端模拟更新标签
+    const updatedNote = {
+      ...currentEditingNote.value,
+      tags: staticTags.value.filter((tag) => tagIds.includes(tag.id)),
+    };
 
-    // 刷新笔记列表
-    await loadNotes();
+    // 更新本地笔记列表
+    const index = notes.value.findIndex((note) => note.id === updatedNote.id);
+    if (index !== -1) {
+      notes.value[index] = updatedNote;
+    }
 
-    // 如果当前正在编辑这个笔记，也需要更新编辑器中的笔记数据
-    if (currentNoteId.value === currentEditingNote.value.id) {
-      const updatedNote = await notesApi.getNoteById(currentNoteId.value);
-      notes.value = notes.value.map((note) =>
-        note.id === currentNoteId.value ? updatedNote : note
-      );
+    ElMessage.success('标签更新成功（仅前端）');
+
+    // 如果当前正在编辑这个笔记，更新编辑器的数据
+    if (currentNoteId.value === updatedNote.id) {
+      const targetNote = notes.value.find((note) => note.id === updatedNote.id);
+      if (targetNote) {
+        editTitle.value = targetNote.title;
+        editContent.value = targetNote.content;
+      }
     }
   } catch (error) {
     console.error('更新标签失败:', error);
-    ElMessage.error('更新标签失败，请重试');
+    ElMessage.error('更新标签失败');
   } finally {
     currentEditingNote.value = null;
     isTagsDialogOpen.value = false;
@@ -364,30 +385,22 @@ const handleUpdateNoteTags = async (updatedData: any) => {
 // 更新优先级
 const handleUpdatePriority = async (id: number, priority: string) => {
   try {
-    // 验证笔记优先级值 - 现在包括 'none'
-    const validPriorities = ['high', 'medium', 'low', 'none'];
-    if (!validPriorities.includes(priority)) {
-      ElMessage.warning('无效的优先级设置');
-      return;
-    }
-
     await notesApi.updateNote(id, { priority });
     ElMessage.success('优先级更新成功');
+    // 刷新笔记列表
+    await loadNotes();
 
-    // 更新本地数据
-    const noteIndex = notes.value.findIndex((note) => note.id === id);
-    if (noteIndex !== -1) {
-      notes.value[noteIndex].priority = priority;
+    // 如果当前正在编辑这个笔记，也更新编辑器中的笔记数据
+    if (currentNoteId.value === id) {
+      const updatedNote = await notesApi.getNoteById(id);
+      const index = notes.value.findIndex((note) => note.id === id);
+      if (index !== -1) {
+        notes.value[index] = updatedNote;
+      }
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error('更新优先级失败:', error);
-
-    // 根据错误类型显示不同消息
-    if (error.response?.status === 422) {
-      ElMessage.error('无效的优先级设置，请检查值是否正确');
-    } else {
-      ElMessage.error('更新优先级失败，请重试');
-    }
+    ElMessage.error('更新优先级失败，请重试');
   }
 };
 

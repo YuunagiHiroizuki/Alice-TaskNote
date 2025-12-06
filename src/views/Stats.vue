@@ -249,7 +249,7 @@ const loading = ref(true);
 const error = ref(null);
 const activeView = ref('week');
 
-// 数据结构
+// 数据的结构
 const statsData = ref({
   today: {
     completed: 0,
