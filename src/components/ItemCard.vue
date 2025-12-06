@@ -85,6 +85,11 @@
               {{ item.isPinned ? '取消置项' : '置项' }}
             </el-dropdown-item>
 
+            <el-dropdown-item command="encrypt">
+              <el-icon><Lock /></el-icon>
+              加密
+            </el-dropdown-item>
+
             <el-dropdown placement="left-start" trigger="hover" class="w-full">
               <div
                 class="flex items-center justify-between w-full px-4 py-2 text-gray-700 cursor-pointer hover:bg-blue-50 hover:text-blue-600"
