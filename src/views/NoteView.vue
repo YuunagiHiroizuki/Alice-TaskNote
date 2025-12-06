@@ -364,22 +364,30 @@ const handleUpdateNoteTags = async (updatedData: any) => {
 // 更新优先级
 const handleUpdatePriority = async (id: number, priority: string) => {
   try {
+    // 验证笔记优先级值 - 现在包括 'none'
+    const validPriorities = ['high', 'medium', 'low', 'none'];
+    if (!validPriorities.includes(priority)) {
+      ElMessage.warning('无效的优先级设置');
+      return;
+    }
+
     await notesApi.updateNote(id, { priority });
     ElMessage.success('优先级更新成功');
-    // 刷新笔记列表
-    await loadNotes();
 
-    // 如果当前正在编辑这个笔记，也更新编辑器中的笔记数据
-    if (currentNoteId.value === id) {
-      const updatedNote = await notesApi.getNoteById(id);
-      const index = notes.value.findIndex((note) => note.id === id);
-      if (index !== -1) {
-        notes.value[index] = updatedNote;
-      }
+    // 更新本地数据
+    const noteIndex = notes.value.findIndex((note) => note.id === id);
+    if (noteIndex !== -1) {
+      notes.value[noteIndex].priority = priority;
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('更新优先级失败:', error);
-    ElMessage.error('更新优先级失败，请重试');
+
+    // 根据错误类型显示不同消息
+    if (error.response?.status === 422) {
+      ElMessage.error('无效的优先级设置，请检查值是否正确');
+    } else {
+      ElMessage.error('更新优先级失败，请重试');
+    }
   }
 };
 
