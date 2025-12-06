@@ -55,6 +55,7 @@
           >
             <el-icon class="scale-75"><PriceTag /></el-icon>
             {{ typeof tag === 'object' ? tag.name : tag }}
+            <!-- {{ tag.name }} -->
           </span>
         </div>
 
