@@ -5,7 +5,9 @@
     title="管理标签"
     width="400px"
   >
-    <p class="text-sm text-gray-500 mb-3">为任务添加或移除标签。</p>
+    <p class="text-sm text-gray-500 mb-3">
+      为{{ item.type === 'task' ? '任务' : '笔记' }}添加或移除标签。
+    </p>
 
     <el-tag
       v-for="tag in currentTagObjects"
@@ -50,7 +52,6 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:modelValue', 'confirm', 'confirm-tags']);
 const currentTagObjects = ref<Tag[]>([]);
-const currentTags = ref<string[]>([]);
 const inputValue = ref('');
 const inputVisible = ref(false);
 const inputRef = ref<InstanceType<typeof ElInput>>();
@@ -60,13 +61,19 @@ watch(
   () => props.item,
   (newItem) => {
     if (newItem && newItem.tags) {
-      currentTags.value = newItem.tags.map((tag) => tag.name);
-      currentTagObjects.value = [...newItem.tags];
+      // 确保标签格式正确，有 id 和 name
+      currentTagObjects.value = newItem.tags.map((tag) => ({
+        id: tag.id || 0,
+        name: tag.name || '',
+        color: tag.color || '#909399',
+      }));
+      console.log('当前标签对象:', currentTagObjects.value);
+    } else {
+      currentTagObjects.value = [];
     }
   },
   { immediate: true }
 );
-
 const handleTagClose = (tag: Tag) => {
   currentTagObjects.value = currentTagObjects.value.filter((t) => t.id !== tag.id);
 };
@@ -77,12 +84,28 @@ const showInput = () => {
   });
 };
 
-const handleInputConfirm = () => {
-  if (inputValue.value && !currentTags.value.includes(inputValue.value)) {
-    const newTagName = inputValue.value;
-    currentTags.value.push(newTagName);
-    currentTagObjects.value.push({ id: null, name: newTagName, color: '#909399' });
+const handleInputConfirm = async () => {
+  if (inputValue.value.trim()) {
+    const newTagName = inputValue.value.trim();
+
+    // 检查是否已存在同名标签
+    const existingTag = currentTagObjects.value.find(
+      (tag) => tag.name.toLowerCase() === newTagName.toLowerCase()
+    );
+
+    if (!existingTag) {
+      // 创建新标签对象（临时，没有ID）
+      const newTag: Tag = {
+        id: null,
+        name: newTagName,
+        color: '#909399',
+      };
+      currentTagObjects.value.push(newTag);
+    } else {
+      ElMessage.warning('该标签已存在');
+    }
   }
+
   inputVisible.value = false;
   inputValue.value = '';
 };
@@ -90,32 +113,46 @@ const handleInputConfirm = () => {
 const handleConfirm = async () => {
   try {
     const existingTags = await fetchTags();
-    const tagObjects: Tag[] = [];
+    const finalTagObjects: Tag[] = [];
 
     for (const tag of currentTagObjects.value) {
       // 如果标签已经有ID，直接使用
-      if (tag.id !== null) {
+      if (tag.id !== null && tag.id > 0) {
         const existingTag = existingTags.find((t) => t.id === tag.id);
         if (existingTag) {
-          tagObjects.push(existingTag);
+          finalTagObjects.push(existingTag);
           continue;
         }
       }
 
       // 否则按名称查找或创建
-      const existingTag = existingTags.find((t) => t.name === tag.name);
-      if (existingTag) {
-        tagObjects.push(existingTag);
+      const existingTagByName = existingTags.find(
+        (t) => t.name.toLowerCase() === tag.name.toLowerCase()
+      );
+
+      if (existingTagByName) {
+        finalTagObjects.push(existingTagByName);
       } else {
+        // 创建新标签
         const newTag = await createTag({
           name: tag.name,
           color: tag.color || '#909399',
         });
-        tagObjects.push(newTag);
+        if (newTag.id) {
+          finalTagObjects.push(newTag);
+        }
       }
     }
 
-    emit('confirm-tags', tagObjects);
+    const validTags = finalTagObjects.filter((tag) => tag.id !== null && tag.id !== undefined);
+
+    // 根据item类型触发不同的事件
+    if (props.item.type === 'task') {
+      emit('confirm-tags', validTags);
+    } else {
+      emit('confirm', validTags);
+    }
+
     emit('update:modelValue', false);
     ElMessage.success('标签设置成功');
   } catch (error) {

@@ -12,8 +12,8 @@
         />
         <el-button
           :icon="Filter"
-          @click="toggleFilterSearch"
-          :type="isFilterActive ? 'primary' : 'default'"
+          @click="toggleFilter"
+          :type="isReverseFilter ? 'primary' : 'default'"
         >
           过滤
         </el-button>
@@ -83,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onActivated } from 'vue';
+import { ref, computed, onMounted, onActivated, watch } from 'vue';
 import { ElMessage } from 'element-plus';
 import { fetchTasks, createTask, updateTask, deleteTask, searchTasks } from '@/api/task';
 import ItemCard from '@/components/ItemCard.vue';
@@ -101,7 +101,11 @@ const isEditDialogOpen = ref(false);
 const isTagsDialogOpen = ref(false);
 const currentEditingItem = ref<Item | null>(null);
 const showInput = ref(false);
-const isFilterActive = ref(false);
+// 反向过滤状态：true表示过滤掉包含搜索关键词的卡片，false表示正常搜索（显示包含关键词的卡片）
+const isReverseFilter = ref(false);
+const selectedPriority = ref<string | null>(null);
+let searchTimer: ReturnType<typeof setTimeout> | null = null;
+const SEARCH_DEBOUNCE_MS = 300;
 
 onActivated(() => {
   loadTasks();
@@ -110,9 +114,11 @@ onActivated(() => {
 const loadTasks = async (query?: string) => {
   try {
     let res;
-    if (query) {
+    if (query && !isReverseFilter.value) {
+      // 正向搜索时，向后端发送搜索请求
       res = await searchTasks(query);
     } else {
+      // 反向搜索或没有搜索词时，获取所有任务，在前端过滤
       res = await fetchTasks();
     }
 
@@ -132,16 +138,84 @@ const loadTasks = async (query?: string) => {
   }
 };
 
-const pendingTasks = computed(() =>
-  tasks.value
-    .filter((t) => t.status !== 'done')
-    .sort((a, b) => Number(b.isPinned) - Number(a.isPinned))
-);
-const completedTasks = computed(() =>
-  tasks.value
-    .filter((t) => t.status === 'done')
-    .sort((a, b) => Number(b.isPinned) - Number(a.isPinned))
-);
+const priorityWeight = {
+  high: 4,
+  medium: 3,
+  low: 2,
+  none: 1,
+};
+
+// 修改：排序函数 - 优先按置顶，然后按优先级，最后按更新时间
+const sortTasks = (tasks: Item[]) => {
+  return [...tasks].sort((a, b) => {
+    // 1. 先按置顶排序（置顶的在前）
+    if (a.isPinned !== b.isPinned) {
+      return b.isPinned ? 1 : -1;
+    }
+
+    // 2. 按优先级权重排序（权重高的在前）
+    const aPriorityWeight = priorityWeight[a.priority as keyof typeof priorityWeight] || 1;
+    const bPriorityWeight = priorityWeight[b.priority as keyof typeof priorityWeight] || 1;
+    if (aPriorityWeight !== bPriorityWeight) {
+      return bPriorityWeight - aPriorityWeight;
+    }
+
+    // 3. 按更新时间排序（最新的在前）
+    const aTime = new Date(a.updatedAt || a.updated_at || a.createdAt || a.created_at).getTime();
+    const bTime = new Date(b.updatedAt || b.updated_at || b.createdAt || b.created_at).getTime();
+    return bTime - aTime;
+  });
+};
+
+// 修改：添加搜索和优先级筛选，以及反向过滤逻辑
+const filteredTasks = computed(() => {
+  let filtered = tasks.value;
+
+  // 优先级筛选
+  if (selectedPriority.value) {
+    filtered = filtered.filter((task) => task.priority === selectedPriority.value);
+  }
+
+  // 搜索筛选
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase().trim();
+
+    if (isReverseFilter.value) {
+      // 反向过滤：只显示不包含搜索关键词的卡片
+      filtered = filtered.filter(
+        (task) =>
+          !task.title.toLowerCase().includes(query) &&
+          !task.content.toLowerCase().includes(query) &&
+          !(task.tags && task.tags.some((tag) => tag.name.toLowerCase().includes(query)))
+      );
+    } else {
+      // 正向过滤：正常搜索，显示包含搜索关键词的卡片
+      filtered = filtered.filter(
+        (task) =>
+          task.title.toLowerCase().includes(query) ||
+          task.content.toLowerCase().includes(query) ||
+          (task.tags && task.tags.some((tag) => tag.name.toLowerCase().includes(query)))
+      );
+    }
+  }
+
+  return filtered;
+});
+
+// 修改：应用排序和筛选
+const pendingTasks = computed(() => {
+  const pending = filteredTasks.value.filter((t) => t.status !== 'done');
+  return sortTasks(pending);
+});
+
+const completedTasks = computed(() => {
+  const completed = filteredTasks.value.filter((t) => t.status === 'done');
+  return sortTasks(completed);
+});
+
+// 新增：带筛选的统计
+const filteredPendingTasks = computed(() => pendingTasks.value);
+const filteredCompletedTasks = computed(() => completedTasks.value);
 
 const handleQuickCreate = async () => {
   if (!newTaskTitle.value.trim()) return;
@@ -289,44 +363,54 @@ const handleUpdateTask = async (updatedData: Partial<Item>) => {
 
 const handleSearch = () => {
   const query = searchQuery.value.trim();
-  loadTasks(query);
   if (query) {
-    isFilterActive.value = true;
+    // 如果启用了反向过滤，不要向后端发送搜索请求
+    if (isReverseFilter.value) {
+      // 反向过滤在前端处理，只需刷新任务列表（获取所有任务）
+      loadTasks();
+    } else {
+      // 正向搜索，向后端发送搜索请求
+      loadTasks(query);
+    }
   } else {
-    isFilterActive.value = false;
-  }
-};
-
-const toggleFilterSearch = () => {
-  // 情况 1: 当前非激活状态，且搜索框有内容 -> 执行搜索并激活按钮
-  if (!isFilterActive.value && searchQuery.value.trim()) {
-    isFilterActive.value = true;
-    handleSearch();
-  }
-  // 情况 2: 当前是激活状态 -> 重置搜索，并取消激活按钮
-  else if (isFilterActive.value) {
-    isFilterActive.value = false;
-    searchQuery.value = '';
-    handleSearch();
-  }
-  // 情况 3: 当前非激活状态，且搜索框无内容 -> 不做任何操作
-};
-
-onMounted(() => loadTasks());
-
-const resetSearch = () => {
-  if (searchQuery.value) {
-    searchQuery.value = '';
+    // 搜索框为空时，重置过滤状态并加载所有任务
+    isReverseFilter.value = false;
     loadTasks();
+  }
+};
+
+// 监听搜索框变化，实现自动搜索
+watch(searchQuery, (newValue) => {
+  if (searchTimer) {
+    clearTimeout(searchTimer);
+  }
+
+  searchTimer = setTimeout(() => {
+    handleSearch();
+  }, SEARCH_DEBOUNCE_MS);
+});
+
+const toggleFilter = () => {
+  if (searchQuery.value.trim()) {
+    // 有搜索词时，切换反向过滤状态
+    isReverseFilter.value = !isReverseFilter.value;
+
+    // 立即应用新的过滤规则
+    if (isReverseFilter.value) {
+      // 切换到反向过滤：重新加载所有任务，在前端过滤
+      loadTasks();
+    } else {
+      // 切换到正向过滤：向后端发送搜索请求
+      loadTasks(searchQuery.value.trim());
+    }
+  } else {
+    // 没有搜索词时，提示用户
+    ElMessage.warning('请先在搜索框中输入关键词');
   }
 };
 
 // 在 TodoView.vue 中添加
 const handleUpdateTags = async (tags: Tag[]) => {
-  console.log('handleUpdateTags 被调用！');
-  console.log('接收到的标签:', tags);
-  console.log('当前编辑的任务:', currentEditingItem.value);
-
   if (!currentEditingItem.value) {
     console.error('没有当前编辑的任务！');
     return;
@@ -351,6 +435,8 @@ const handleUpdateTags = async (tags: Tag[]) => {
     console.error('更新标签错误:', error);
   }
 };
+
+onMounted(() => loadTasks());
 </script>
 
 <style scoped>
@@ -358,6 +444,10 @@ const handleUpdateTags = async (tags: Tag[]) => {
   transition: all 0.25s ease;
 }
 .slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
 .mt-big {
   margin-top: 32px;
 }

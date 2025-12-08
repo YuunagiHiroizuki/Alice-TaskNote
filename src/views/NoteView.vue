@@ -100,7 +100,7 @@ interface Note {
   priority: string;
   status: string;
   isPinned: boolean;
-  tags: Array<{ id: number; name: string; color: string }>;
+  tags: { id: number; name: string; color?: string }[];
   created_at: string;
   updated_at: string;
 }
@@ -164,8 +164,9 @@ const loadNotes = async () => {
       sort_by: 'isPinned',
       order: 'desc',
     });
-    // 使用转换函数将 Note 转换为 Item
+    // 使用转换函数将 Note 转换为 Item，并确保标签格式正确
     notes.value = response.map(convertNoteToItem);
+    console.log('加载的笔记数据:', notes.value); // 调试用
   } catch (error) {
     console.error('加载笔记失败:', error);
     ElMessage.error('加载笔记失败，请重试');
@@ -344,8 +345,7 @@ const handleUpdateNoteTags = async (tags: Tag[]) => {
 
   try {
     const tagIds = tags.map((tag) => tag.id).filter((id) => id !== null);
-    console.log('更新笔记标签，标签ID:', tagIds);
-    // 调用后端API更新标签 - 使用正确的端点
+
     await notesApi.updateNoteTags(currentEditingNote.value.id, tagIds);
 
     ElMessage.success('标签更新成功');
@@ -414,6 +414,19 @@ const convertNoteToItem = (note: any): Item => {
     priority = 'none';
   }
 
+  let tagsArray = [];
+  if (note.tags && Array.isArray(note.tags)) {
+    tagsArray = note.tags.map((tag: any) => ({
+      id: tag.id || 0,
+      name: tag.name || '',
+      color: tag.color || '#909399',
+    }));
+  } else if (note.tags) {
+    // 如果 tags 不是数组，尝试转换
+    console.warn('Note tags 不是数组:', note.tags);
+    tagsArray = [];
+  }
+
   return {
     id: note.id,
     type: 'note' as const,
@@ -422,7 +435,7 @@ const convertNoteToItem = (note: any): Item => {
     priority: priority,
     status: (note.status || 'done') as 'todo' | 'doing' | 'done' | string,
     isPinned: note.isPinned || false,
-    tags: note.tags || [],
+    tags: tagsArray, // 使用处理后的标签数组
     // 确保两个版本的字段都有值
     created_at: note.created_at || note.createdAt || new Date().toISOString(),
     updated_at: note.updated_at || note.updatedAt || new Date().toISOString(),

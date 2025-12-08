@@ -15,6 +15,7 @@
     <!-- 任务标签部分 -->
     <div class="mb-8">
       <h3 class="text-lg font-semibold text-gray-700 mb-3">任务标签</h3>
+      <span class="text-sm text-gray-500">共 {{ filteredTaskTags.length }} 个</span>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
         <TagCard
           v-for="tag in filteredTaskTags"
@@ -32,6 +33,7 @@
     <!-- 笔记标签部分 -->
     <div>
       <h3 class="text-lg font-semibold text-gray-700 mb-3">笔记标签</h3>
+      <span class="text-sm text-gray-500">共 {{ filteredNoteTags.length }} 个</span>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
         <TagCard
           v-for="tag in filteredNoteTags"
@@ -62,41 +64,59 @@ const searchQuery = ref('');
 const loadTags = async (query?: string) => {
   try {
     const tags = await fetchTags(query);
+    console.log('加载的标签数据:', tags); // 调试用
     allTags.value = tags;
   } catch (error) {
     console.error('加载标签失败:', error);
-    // 可选：显示 ElMessage.error 提示
   }
 };
 
 onMounted(() => loadTags());
 // 统计任务标签数量 - 只显示有任务关联的标签
 const taskTags = computed(() => {
-  return allTags.value.filter((tag) => (tag.task_count || 0) > 0);
+  return allTags.value
+    .filter((tag) => (tag.task_count || 0) > 0)
+    .map((tag) => ({
+      ...tag,
+      task_count: tag.task_count || 0,
+      // 确保标签对象有必要的字段
+      name: tag.name || '',
+      color: tag.color || '#909399',
+    }));
 });
-
 // 统计笔记标签数量 - 只显示有笔记关联的标签
 const noteTags = computed(() => {
-  return allTags.value.filter((tag) => (tag.note_count || 0) > 0);
+  return allTags.value
+    .filter((tag) => (tag.note_count || 0) > 0)
+    .map((tag) => ({
+      ...tag,
+      note_count: tag.note_count || 0,
+      // 确保标签对象有必要的字段
+      name: tag.name || '',
+      color: tag.color || '#909399',
+    }));
 });
 
 // 过滤后的标签
 const filteredTaskTags = computed(() => {
-  return taskTags.value.filter((tag) =>
-    tag.name.toLowerCase().includes(searchQuery.value.trim().toLowerCase())
-  );
+  const query = searchQuery.value.trim().toLowerCase();
+  if (!query) return taskTags.value;
+
+  return taskTags.value.filter((tag) => tag.name.toLowerCase().includes(query));
 });
 
 const filteredNoteTags = computed(() => {
-  return noteTags.value.filter((tag) =>
-    tag.name.toLowerCase().includes(searchQuery.value.trim().toLowerCase())
-  );
+  const query = searchQuery.value.trim().toLowerCase();
+  if (!query) return noteTags.value;
+
+  return noteTags.value.filter((tag) => tag.name.toLowerCase().includes(query));
 });
 
 const handleTagDeleted = () => {
-  // 方式1：重新请求数据（最可靠，确保与后端一致）
-  loadTags();
+  // 重新加载标签数据
+  loadTags(searchQuery.value.trim() || undefined);
 };
+
 onMounted(() => {
   loadTags();
 });

@@ -46,7 +46,7 @@
           <span>{{ formatDate(item.deadline) }}</span>
         </span>
 
-        <div v-if="item.tags && item.tags.length > 0" class="flex items-center gap-2">
+        <div v-if="hasTags" class="flex items-center gap-2">
           <span v-if="item.deadline || item.isPinned" class="text-gray-300">|</span>
           <span
             v-for="tag in item.tags"
@@ -264,19 +264,17 @@ const cardBackgroundClass = computed(() => {
 });
 
 const priorityClass = computed(() => `priority-${props.item.priority || 'none'}`);
+
+const hasTags = computed(() => {
+  return props.item.tags && Array.isArray(props.item.tags) && props.item.tags.length > 0;
+});
+
 const shouldShowMeta = computed(() => {
-  return true;
-  //   props.item.isPinned ||
-  //   props.item.deadline ||
-  //   (props.item.tags && props.item.tags.length > 0) ||
-  //   (props.item.subTasks && props.item.subTasks.length > 0)
-  // );
+  return props.item.isPinned || props.item.deadline || hasTags.value;
 });
 
 const shouldShowDividerForSubtask = computed(() => {
-  return (
-    props.item.isPinned || props.item.deadline || (props.item.tags && props.item.tags.length > 0)
-  );
+  return props.item.isPinned || props.item.deadline || hasTags.value;
 });
 
 const formatDate = (dateStr: string) => {
