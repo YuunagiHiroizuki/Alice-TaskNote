@@ -79,7 +79,6 @@ const taskTags = computed(() => {
     .map((tag) => ({
       ...tag,
       task_count: tag.task_count || 0,
-      // 确保标签对象有必要的字段
       name: tag.name || '',
       color: tag.color || '#909399',
     }));
@@ -91,7 +90,6 @@ const noteTags = computed(() => {
     .map((tag) => ({
       ...tag,
       note_count: tag.note_count || 0,
-      // 确保标签对象有必要的字段
       name: tag.name || '',
       color: tag.color || '#909399',
     }));
