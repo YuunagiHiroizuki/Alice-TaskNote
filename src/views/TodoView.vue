@@ -21,7 +21,7 @@
       </div>
     </header>
     <transition name="slide-fade">
-      <div v-if="showInput" class="mt-4 mb-2">
+      <div v-if="showInput" class="mt-4 mb-8">
         <el-input
           v-model="newTaskTitle"
           placeholder="一句话快速创建任务 (例如：下午3点开会) ... 按 Enter 提交"
@@ -35,10 +35,10 @@
         <el-button text class="mt-1" @click="dialogVisible = true"> 或使用手动创建... </el-button>
       </div>
     </transition>
-    <h2 class="text-lg font-semibold text-gray-700 mb-3" :class="{ 'mt-8': !showInput }">
+    <h2 class="text-lg font-semibold text-gray-700 mb-3 mt-4">
       未完成 ({{ pendingTasks.length }})
     </h2>
-    <div v-if="pendingTasks.length > 0">
+    <div v-if="pendingTasks.length > 0" class="min-h-60">
       <ItemCard
         v-for="task in pendingTasks"
         :key="task.id"
@@ -50,7 +50,7 @@
         @openDialog="handleOpenDialog"
       />
     </div>
-    <el-empty v-else description="太棒了，全部完成了！" />
+    <el-empty v-else description="太棒了，全部完成了！" class="min-h-60" />
     <div class="my-8 border-t border-gray-200"></div>
     <h2 class="text-lg font-semibold text-gray-700 mb-3">已完成 ({{ completedTasks.length }})</h2>
     <div v-if="completedTasks.length > 0">

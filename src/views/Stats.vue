@@ -59,7 +59,7 @@
                 :size="200"
               />
             </div>
-            <div class="mt-4 grid grid-cols-3 gap-2 text-center">
+            <div class="mt-4 grid grid-cols-2 gap-2 text-center">
               <div style="font-family: inherit; color: black">
                 <div
                   class="text-2xl font-bold text-(--chart-primary)"
@@ -69,7 +69,7 @@
                 </div>
                 <div class="text-sm" style="font-family: inherit; color: black">已完成</div>
               </div>
-              <div style="font-family: inherit; color: black">
+              <!-- <div style="font-family: inherit; color: black">
                 <div
                   class="text-2xl font-bold text-(--chart-secondary)"
                   style="font-family: inherit; color: black"
@@ -77,7 +77,7 @@
                   {{ todayStats.inProgress }}
                 </div>
                 <div class="text-sm" style="font-family: inherit; color: black">进行中</div>
-              </div>
+              </div> -->
               <div style="font-family: inherit; color: black">
                 <div
                   class="text-2xl font-bold text-(--chart-accent)"
@@ -157,10 +157,10 @@
                 <div class="w-5 h-5 bg-(--chart-primary) rounded-full"></div>
                 <span style="font-family: inherit; color: black">已完成</span>
               </div>
-              <div class="flex items-center space-x-2" style="font-family: inherit; color: black">
+              <!-- <div class="flex items-center space-x-2" style="font-family: inherit; color: black">
                 <div class="w-5 h-5 bg-(--chart-secondary) rounded-full"></div>
                 <span style="font-family: inherit; color: black">进行中</span>
-              </div>
+              </div> -->
               <div class="flex items-center space-x-2" style="font-family: inherit; color: black">
                 <div class="w-5 h-5 bg-(--chart-accent) rounded-full"></div>
                 <span style="font-family: inherit; color: black">待完成</span>
@@ -199,14 +199,14 @@
                     >{{ priority.completed }}</span
                   >
                 </div>
-                <div class="flex justify-between" style="font-family: inherit; color: black">
+                <!-- <div class="flex justify-between" style="font-family: inherit; color: black">
                   <span style="font-family: inherit; color: black">进行中:</span>
                   <span
                     class="font-medium text-(--chart-secondary)"
                     style="font-family: inherit; color: black"
                     >{{ priority.inProgress }}</span
                   >
-                </div>
+                </div> -->
                 <div class="flex justify-between" style="font-family: inherit; color: black">
                   <span style="font-family: inherit; color: black">待完成:</span>
                   <span

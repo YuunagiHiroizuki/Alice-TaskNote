@@ -93,21 +93,21 @@ const updateChart = () => {
           pointHoverRadius: 0,
           pointHitRadius: 0,
         },
-        {
-          label: '进行中',
-          data: inProgressData,
-          fill: {
-            target: 'origin',
-            above: chartSecondaryFade,
-          },
-          backgroundColor: chartSecondaryFade,
-          borderColor: colors.inProgress, // 使用统一的颜色
-          tension: 0.4,
-          // 移除点的显示
-          pointRadius: 0,
-          pointHoverRadius: 0,
-          pointHitRadius: 0,
-        },
+        // {
+        //   label: '进行中',
+        //   data: inProgressData,
+        //   fill: {
+        //     target: 'origin',
+        //     above: chartSecondaryFade,
+        //   },
+        //   backgroundColor: chartSecondaryFade,
+        //   borderColor: colors.inProgress, // 使用统一的颜色
+        //   tension: 0.4,
+        //   // 移除点的显示
+        //   pointRadius: 0,
+        //   pointHoverRadius: 0,
+        //   pointHitRadius: 0,
+        // },
         {
           label: '待完成',
           data: remainingData,
