@@ -13,7 +13,6 @@
         <el-input v-model="form.content" type="textarea" />
       </el-form-item>
       <el-form-item label="截止日期">
-        <!-- 不使用 value-format，这样 v-model 将是 Date | null -->
         <el-date-picker
           v-model="form.deadline"
           type="date"

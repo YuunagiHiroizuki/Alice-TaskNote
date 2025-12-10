@@ -139,13 +139,13 @@ const updateChart = () => {
           borderColor: colors.completed, // 使用统一的颜色
           borderWidth: 1,
         },
-        {
-          label: '进行中',
-          data: inProgress,
-          backgroundColor: colors.inProgress, // 使用统一的颜色
-          borderColor: colors.inProgress, // 使用统一的颜色
-          borderWidth: 1,
-        },
+        // {
+        //   label: '进行中',
+        //   data: inProgress,
+        //   backgroundColor: colors.inProgress, // 使用统一的颜色
+        //   borderColor: colors.inProgress, // 使用统一的颜色
+        //   borderWidth: 1,
+        // },
         {
           label: '待完成',
           data: remaining,
